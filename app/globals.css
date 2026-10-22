@@ -1,1 +1,97 @@
 @import "tailwindcss";
+@config "../tailwind.config.ts";
+
+/* Base styles for a clean, minimalist aesthetic */
+@layer base {
+  :root {
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: #f8fafc;
+    color: #1e293b;
+    font-family: var(--font-inter, var(--font-sans));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: rgba(99, 102, 241, 0.2);
+    color: #4338ca;
+  }
+}
+
+/* ==========================================================================
+   Motion Design: Global Page Transition (60fps GPU Composited)
+   - Style: Smooth Fade-In + Elevation Glide
+   - Curve: cubic-bezier(0.25, 1, 0.5, 1) (Quartic Decel / iOS-like spring ease)
+   - Duration: 0.6s
+   - Zero CLS (Cumulative Layout Shift) & Zero Paint thrashing
+   ========================================================================== */
+@keyframes pageEntrance {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.995);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.page-transition {
+  animation: pageEntrance 0.6s cubic-bezier(0.25, 1, 0.5, 1) both;
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+  transform: translateZ(0);
+}
+
+/* Accessibility: Respect user's vestibular / reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+}
+
+/* Custom entrance animations and utility classes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animation-delay-150 {
+    animation-delay: 150ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
+}
