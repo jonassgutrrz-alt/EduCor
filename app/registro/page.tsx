@@ -11,7 +11,9 @@ interface DatosPadron {
   dni: string;
   nombre_completo: string;
   rol: string;
-  curso_division?: string;
+  grado?: string;
+  seccion?: string;
+  colegio_id?: string;
   registrado: boolean;
 }
 
@@ -28,7 +30,7 @@ export default function Registro() {
   // Paso 1: Verificar si el DNI está en la lista blanca y no ha sido registrado
   const handleVerificarDNI = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!dni) {
+    if (!dni.trim()) {
       showToast("Por favor, ingresa tu número de DNI.", "warning");
       return;
     }
@@ -37,23 +39,32 @@ export default function Registro() {
     const { data, error } = await supabase
       .from("padron_autorizado")
       .select("*")
-      .eq("dni", dni)
+      .eq("dni", dni.trim())
       .single();
 
     if (error || !data) {
-      showToast("El DNI ingresado no se encuentra en el padrón de la institución.", "error");
+      showToast(
+        "El DNI ingresado no se encuentra en el padrón de la institución.",
+        "error"
+      );
       setCargando(false);
       return;
     }
 
     if (data.registrado) {
-      showToast("Este DNI ya tiene una cuenta registrada. Por favor, inicia sesión.", "warning");
+      showToast(
+        "Este DNI ya tiene una cuenta registrada. Por favor, inicia sesión.",
+        "warning"
+      );
       setCargando(false);
       return;
     }
 
     setDatosPadron(data as DatosPadron);
-    showToast(`¡Identidad verificada! Hola, ${data.nombre_completo}`, "success");
+    showToast(
+      `¡Identidad verificada! Hola, ${data.nombre_completo}`,
+      "success"
+    );
     setPaso(2);
     setCargando(false);
   };
@@ -65,11 +76,19 @@ export default function Registro() {
       showToast("Por favor completa todos los campos requeridos.", "warning");
       return;
     }
+
+    if (password.length < 6) {
+      showToast("La contraseña debe tener al menos 6 caracteres.", "warning");
+      return;
+    }
+
     setCargando(true);
 
+    const emailLimpio = email.trim().toLowerCase();
+
     // 1. Crear el usuario en Supabase Auth
-    const { error: authError } = await supabase.auth.signUp({
-      email,
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: emailLimpio,
       password,
     });
 
@@ -79,14 +98,19 @@ export default function Registro() {
       return;
     }
 
-    // 2. Insertar los datos en la tabla personalizada 'usuarios'
-    const { error: dbError } = await supabase.from("usuarios").insert([{
-      nombre_completo: datosPadron.nombre_completo,
-      email: email,
-      rol: datosPadron.rol,
-      curso_division: datosPadron.curso_division,
-      contrasena: password
-    }]);
+    // 2. Insertar los datos en la tabla personalizada 'usuarios' usando 'grado' y 'seccion' directamente
+    const { error: dbError } = await supabase.from("usuarios").insert([
+      {
+        id: authData.user?.id,
+        nombre_completo: datosPadron.nombre_completo,
+        email: emailLimpio,
+        rol: datosPadron.rol,
+        grado: datosPadron.grado || null,
+        seccion: datosPadron.seccion || null,
+        colegio_id: datosPadron.colegio_id || null,
+        contrasena: password,
+      },
+    ]);
 
     if (dbError) {
       showToast("Error al guardar los datos del perfil.", "error");
@@ -98,20 +122,25 @@ export default function Registro() {
     await supabase
       .from("padron_autorizado")
       .update({ registrado: true })
-      .eq("dni", dni);
+      .eq("dni", dni.trim());
 
-    showToast("¡Cuenta creada exitosamente! Revisa tu correo de confirmación.", "success");
+    showToast(
+      "¡Cuenta creada exitosamente! Revisa tu correo de confirmación.",
+      "success"
+    );
     setPaso(3);
     setCargando(false);
   };
 
   return (
     <div className="relative min-h-[100dvh] w-full flex flex-col justify-center items-center px-4 py-8 bg-slate-50 overflow-x-hidden dark:bg-slate-950">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-72 sm:h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-72 sm:h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
 
       <main className="relative w-full max-w-md sm:max-w-lg lg:max-w-xl transition-all duration-300">
         <div className="w-full bg-white/95 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-900/5 p-5 sm:p-8 md:p-10">
-          
           <header className="text-center mb-6 sm:mb-8">
             <div className="flex justify-center mb-3 sm:mb-4">
               <Image
@@ -124,7 +153,10 @@ export default function Registro() {
               />
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">
-              Registro <span className="text-indigo-600 dark:text-indigo-400">EduCor</span>
+              Registro{" "}
+              <span className="text-indigo-600 dark:text-indigo-400">
+                EduCor
+              </span>
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
               {paso === 1 && "Verifica tu identidad con tu DNI"}
@@ -137,7 +169,9 @@ export default function Registro() {
           {paso === 1 && (
             <form onSubmit={handleVerificarDNI} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Número de DNI</label>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Número de DNI
+                </label>
                 <input
                   type="text"
                   required
@@ -159,7 +193,10 @@ export default function Registro() {
                   href="/"
                   className="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                 >
-                  ¿Ya tienes una cuenta? <span className="underline decoration-indigo-300 underline-offset-4">Inicia sesión</span>
+                  ¿Ya tienes una cuenta?{" "}
+                  <span className="underline decoration-indigo-300 underline-offset-4">
+                    Inicia sesión
+                  </span>
                 </Link>
               </div>
             </form>
@@ -170,13 +207,18 @@ export default function Registro() {
             <form onSubmit={handleRegistro} className="space-y-4">
               <div className="p-4 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-xl mb-4">
                 <p className="text-sm text-indigo-900 dark:text-indigo-200">
-                  <strong>Hola, {datosPadron.nombre_completo}</strong> <br/>
+                  <strong>Hola, {datosPadron.nombre_completo}</strong> <br />
                   Sos {datosPadron.rol}
+                  {datosPadron.grado
+                    ? ` (${datosPadron.grado}${datosPadron.seccion || ""})`
+                    : ""}
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Correo Electrónico</label>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Correo Electrónico
+                </label>
                 <input
                   type="email"
                   required
@@ -188,10 +230,13 @@ export default function Registro() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Contraseña</label>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Contraseña (mínimo 6 caracteres)
+                </label>
                 <input
                   type="password"
                   required
+                  minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
@@ -211,7 +256,10 @@ export default function Registro() {
                   href="/"
                   className="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                 >
-                  ¿Ya tienes una cuenta? <span className="underline decoration-indigo-300 underline-offset-4">Inicia sesión</span>
+                  ¿Ya tienes una cuenta?{" "}
+                  <span className="underline decoration-indigo-300 underline-offset-4">
+                    Inicia sesión
+                  </span>
                 </Link>
               </div>
             </form>
@@ -221,13 +269,27 @@ export default function Registro() {
           {paso === 3 && (
             <div className="text-center space-y-4 py-4">
               <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 mb-2">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">¡Revisa tu bandeja de entrada!</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                ¡Revisa tu bandeja de entrada!
+              </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Hemos enviado un enlace de confirmación a <strong>{email}</strong>. Debes verificar tu correo antes de poder ingresar al aula.
+                Hemos enviado un enlace de confirmación a{" "}
+                <strong>{email}</strong>. Debes verificar tu correo antes de
+                poder ingresar al aula.
               </p>
               <button
                 onClick={() => router.push("/")}
@@ -237,7 +299,6 @@ export default function Registro() {
               </button>
             </div>
           )}
-
         </div>
       </main>
     </div>
