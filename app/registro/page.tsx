@@ -171,7 +171,7 @@ export default function Registro() {
               <div className="p-4 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-xl mb-4">
                 <p className="text-sm text-indigo-900 dark:text-indigo-200">
                   <strong>Hola, {datosPadron.nombre_completo}</strong> <br/>
-                  Rol asignado: {datosPadron.rol.toUpperCase()}
+                  Sos {datosPadron.rol}
                 </p>
               </div>
 

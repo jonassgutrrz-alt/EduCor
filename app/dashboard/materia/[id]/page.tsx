@@ -738,7 +738,7 @@ function ContenidoMateria() {
                       {entrega.devolucion ? (
                         <div className="mt-2 p-3 bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-900/50 rounded-lg">
                           <p className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 mb-1 uppercase tracking-wider">
-                            Feedback del Docente
+                            Comentario:
                           </p>
                           <p className="text-sm text-slate-700 dark:text-slate-300 italic leading-relaxed">
                             &quot;{entrega.devolucion}&quot;
