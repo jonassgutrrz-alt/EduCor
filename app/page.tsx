@@ -1,20 +1,24 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { useToast } from "@/components/Toast";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [cargando, setCargando] = useState(false);
   const router = useRouter();
+  const { showToast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Por favor completa todos los campos.");
+      showToast("Por favor completa todos los campos.", "warning");
       return;
     }
 
@@ -24,54 +28,51 @@ export default function Login() {
       const { data, error } = await supabase
         .from("usuarios")
         .select("*")
-        .eq("email", email)
+        .eq("email", email.trim().toLowerCase())
         .eq("contrasena", password)
         .single();
 
       if (error || !data) {
-        alert("Credenciales incorrectas. Verifica tu email y contraseña.");
+        showToast("Credenciales incorrectas. Verifica tu email y contraseña.", "error");
         setCargando(false);
         return;
       }
 
-      sessionStorage.setItem("usuario_id", data.id);
+      sessionStorage.setItem("usuario_id", String(data.id));
       sessionStorage.setItem("usuario", data.nombre_completo);
       sessionStorage.setItem("rol", data.rol);
 
+      showToast(`¡Bienvenido de vuelta, ${data.nombre_completo}!`, "success");
       router.push("/dashboard");
     } catch {
-      alert("Error de conexión. Intente nuevamente.");
+      showToast("Error de conexión. Intente nuevamente.", "error");
       setCargando(false);
     }
   };
 
   return (
-    <div className="relative min-h-[100dvh] w-full flex flex-col justify-center items-center px-4 py-8 sm:px-6 md:px-8 lg:px-12 bg-slate-50 overflow-x-hidden dark:bg-slate-950">
-      {/* Background Ambient Glow (GPU-friendly, non-intrusive) */}
+    <div className="relative min-h-dvh w-full flex flex-col justify-center items-center px-4 py-8 sm:px-6 md:px-8 lg:px-12 bg-slate-50 overflow-x-hidden dark:bg-slate-950">
+      {/* Ambient background glow */}
       <div 
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-72 sm:h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" 
         aria-hidden="true" 
       />
 
-      {/* Responsive Container: Fluid width across Mobile (320-767px), Tablet (768-1023px), and Desktop (1024px+) */}
+      {/* Fluid Card Container */}
       <main className="relative w-full max-w-md sm:max-w-lg lg:max-w-xl transition-all duration-300">
         <div className="w-full bg-white/95 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-900/5 p-5 sm:p-8 md:p-10">
           
-          {/* Header Section with Fluid Responsive Typography */}
+          {/* Header Section: Replaced SVG with official EduCor.png Logo */}
           <header className="text-center mb-6 sm:mb-8">
-            <div className="inline-flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/25 mb-3 sm:mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-6 w-6 sm:h-7 sm:w-7"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
+            <div className="flex justify-center mb-3 sm:mb-4">
+              <Image
+                src="/EduCor.png"
+                alt="Logo EduCor"
+                width={80}
+                height={80}
+                priority
+                // className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-md transition-transform duration-300 hover:scale-105"
+              />
             </div>
             
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
@@ -82,7 +83,7 @@ export default function Login() {
             </p>
           </header>
 
-          {/* Login Form with 44px+ Touch-Friendly Targets */}
+          {/* Form */}
           <form onSubmit={handleLogin} className="space-y-4 sm:space-y-5">
             <div>
               <label 
@@ -98,7 +99,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu.nombre@educor.com"
-                className="w-full min-h-[48px] px-3.5 sm:px-4 py-2.5 text-base sm:text-sm text-slate-900 bg-white dark:bg-slate-800 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all placeholder:text-slate-400 shadow-sm"
+                className="w-full min-h-12 px-3.5 sm:px-4 py-2.5 text-base sm:text-sm text-slate-900 bg-white dark:bg-slate-800 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all placeholder:text-slate-400 shadow-sm"
               />
             </div>
 
@@ -116,15 +117,15 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full min-h-[48px] px-3.5 sm:px-4 py-2.5 text-base sm:text-sm text-slate-900 bg-white dark:bg-slate-800 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all placeholder:text-slate-400 shadow-sm"
+                className="w-full min-h-12 px-3.5 sm:px-4 py-2.5 text-base sm:text-sm text-slate-900 bg-white dark:bg-slate-800 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all placeholder:text-slate-400 shadow-sm"
               />
             </div>
 
-            {/* Submit Button with Active Scale & Mobile-Friendly Tap Height */}
+            {/* Mobile Touch Button */}
             <button
               type="submit"
               disabled={cargando}
-              className="w-full min-h-[48px] px-4 py-3 text-sm sm:text-base font-bold text-white rounded-full bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-700 shadow-md shadow-indigo-500/25 hover:from-indigo-600 hover:to-indigo-800 hover:shadow-lg hover:shadow-indigo-500/35 active:scale-95 disabled:opacity-50 disabled:pointer-events-none transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-2"
+              className="w-full min-h-12 px-4 py-3 text-sm sm:text-base font-bold text-white rounded-full bg-linear-to-r from-indigo-500 via-indigo-600 to-indigo-700 shadow-md shadow-indigo-500/25 hover:from-indigo-600 hover:to-indigo-800 hover:shadow-lg hover:shadow-indigo-500/35 active:scale-95 disabled:opacity-50 disabled:pointer-events-none transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-2"
             >
               {cargando ? (
                 <>
@@ -143,9 +144,16 @@ export default function Login() {
                 <span>Ingresar al Aula</span>
               )}
             </button>
+            <div className="text-center pt-2">
+              <Link
+                href="/registro"
+                className="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
+              >
+                ¿No tienes una cuenta? <span className="underline decoration-indigo-300 underline-offset-4">Regístrate ahora</span>
+              </Link>
+            </div>
           </form>
 
-          {/* Footer Badge / Accessibility info */}
           <footer className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800/80 text-center">
             <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />

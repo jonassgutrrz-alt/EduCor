@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { ToastProvider } from "@/components/Toast";
 import "./globals.css";
 
 const inter = Inter({
@@ -34,7 +35,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body className="min-h-[100dvh] w-full flex flex-col overflow-x-hidden bg-slate-50 text-slate-800 font-sans selection:bg-indigo-500 selection:text-white">
-        {children}
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );

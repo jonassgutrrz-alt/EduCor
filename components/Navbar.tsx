@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Button from "./Button";
 
 export interface NavItem {
@@ -28,20 +29,14 @@ export const Navbar: React.FC = () => {
           
           {/* Logo with Smooth Hover Rotation */}
           <Link href="/" className="group flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/25 transition-transform duration-300 ease-in-out group-hover:rotate-6 group-hover:scale-105">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
-            </div>
+            <Image
+              src="/EduCor.png"
+              alt="EduCor Logo"
+              width={40}
+              height={40}
+              priority
+              className="h-10 w-10 object-contain rounded-xl transition-transform duration-300 ease-in-out group-hover:rotate-6 group-hover:scale-105"
+            />
             <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
               Edu<span className="text-indigo-600 dark:text-indigo-400">Cor</span>
             </span>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -111,35 +112,37 @@ export default function Dashboard() {
 
   if (cargando) {
     return (
-      <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center bg-slate-50 text-slate-600 px-4">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent mb-3" />
-        <p className="text-sm sm:text-base font-medium">Cargando aula virtual en vivo...</p>
+      <div className="min-h-dvh w-full flex flex-col items-center justify-center bg-slate-50 text-slate-600 px-4">
+        <Image
+          src="/EduCor.png"
+          alt="EduCor Logo"
+          width={64}
+          height={64}
+          priority
+          // className="h-16 w-16 object-contain animate-pulse mb-4"
+        />
+        <div className="h-7 w-7 animate-spin rounded-full border-3 border-indigo-600 border-t-transparent mb-3" />
+        <p className="text-sm sm:text-base font-medium text-slate-600">Cargando aula virtual en vivo...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] w-full bg-slate-50 py-4 px-3 sm:px-6 lg:px-8 overflow-x-hidden text-slate-800 dark:bg-slate-950 dark:text-slate-100">
+    <div className="min-h-dvh w-full bg-slate-50 py-4 px-3 sm:px-6 lg:px-8 overflow-x-hidden text-slate-800 dark:bg-slate-950 dark:text-slate-100">
       <div className="mx-auto w-full max-w-5xl space-y-4 sm:space-y-6">
         
-        {/* RESPONSIVE HEADER: Stacks on mobile (320-767px), horizontal on tablet & desktop (768px+) */}
+        {/* RESPONSIVE HEADER with official EduCor.png Logo */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-all">
           <div className="flex items-center justify-between sm:justify-start gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-500/25">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-5 w-5"
-                >
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
-              </div>
+            <div className="flex items-center gap-3">
+              <Image
+                src="/EduCor.png"
+                alt="EduCor Logo"
+                width={44}
+                height={44}
+                priority
+                // className="h-10 w-10 sm:h-11 sm:w-11 object-contain drop-shadow-sm transition-transform duration-200 hover:scale-105"
+              />
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                   Edu<span className="text-indigo-600 dark:text-indigo-400">Cor</span>
@@ -151,7 +154,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Mobile-only Logout button for quick access */}
+            {/* Quick-tap 44px logout button for mobile */}
             <button
               onClick={handleCerrarSesion}
               className="sm:hidden min-h-[44px] min-w-[44px] px-3 py-2 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors cursor-pointer dark:bg-rose-950/40 dark:text-rose-400"
@@ -161,7 +164,7 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Desktop & Tablet User details & Logout */}
+          {/* User metadata & full desktop logout button */}
           <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <span className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium">
@@ -181,7 +184,7 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* MAIN CONTENT AREA */}
+        {/* Dynamic Card Grids */}
         <main className="space-y-4 sm:space-y-6">
           <section className="bg-white dark:bg-slate-900 p-4 sm:p-6 md:p-8 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
@@ -197,7 +200,7 @@ export default function Dashboard() {
               </span>
             </div>
 
-            {/* VISTA ALUMNO: 1 col on mobile (<768px), 2 cols on tablet (768-1023px), 3 cols on desktop (1024px+) */}
+            {/* FLUID CSS GRID */}
             {rol === "alumno" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 lg:gap-6">
                 {materias.map((materia) => (
@@ -239,7 +242,7 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* VISTA DOCENTE: Responsive Card Grid with 44px Action Targets */}
+            {/* Docente View */}
             {rol === "docente" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 lg:gap-6">
                 {materias.map((materia) => (
@@ -269,16 +272,10 @@ export default function Dashboard() {
                     </div>
                   </div>
                 ))}
-
-                {materias.length === 0 && (
-                  <div className="col-span-full py-12 text-center">
-                    <p className="text-sm text-slate-500">No tienes materias asignadas actualmente.</p>
-                  </div>
-                )}
               </div>
             )}
 
-            {/* VISTA ADMIN: Fluid CSV Upload */}
+            {/* Admin CSV View */}
             {rol === "admin" && (
               <div className="p-4 sm:p-6 bg-purple-50/60 dark:bg-purple-950/20 border border-purple-200/80 dark:border-purple-900 rounded-2xl space-y-4">
                 <div>
