@@ -39,12 +39,14 @@ export default function Dashboard() {
       if (roleStored === "alumno") {
         const { data } = await supabase
           .from("inscripciones")
-          .select(`
+          .select(
+            `
             materias (
               id, nombre,
               usuarios ( nombre_completo )
             )
-          `)
+          `,
+          )
           .eq("alumno_id", userId);
 
         if (data) {
@@ -104,7 +106,9 @@ export default function Dashboard() {
       const text = event.target?.result as string;
       const lineas = text.split("\n").filter((line) => line.trim() !== "");
       const cantidadUsuarios = lineas.length > 1 ? lineas.length - 1 : 0;
-      setMensajeAdmin(`✅ ¡Éxito! Procesados ${cantidadUsuarios} usuarios del archivo CSV.`);
+      setMensajeAdmin(
+        `✅ ¡Éxito! Procesados ${cantidadUsuarios} usuarios del archivo CSV.`,
+      );
       if (fileCsvRef.current) fileCsvRef.current.value = "";
     };
     reader.readAsText(file);
@@ -122,7 +126,9 @@ export default function Dashboard() {
           // className="h-16 w-16 object-contain animate-pulse mb-4"
         />
         <div className="h-7 w-7 animate-spin rounded-full border-3 border-indigo-600 border-t-transparent mb-3" />
-        <p className="text-sm sm:text-base font-medium text-slate-600">Cargando aula virtual en vivo...</p>
+        <p className="text-sm sm:text-base font-medium text-slate-600">
+          Cargando aula virtual en vivo...
+        </p>
       </div>
     );
   }
@@ -130,7 +136,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-dvh w-full bg-slate-50 py-4 px-3 sm:px-6 lg:px-8 overflow-x-hidden text-slate-800 dark:bg-slate-950 dark:text-slate-100">
       <div className="mx-auto w-full max-w-5xl space-y-4 sm:space-y-6">
-        
         {/* RESPONSIVE HEADER with official EduCor.png Logo */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-all">
           <div className="flex items-center justify-between sm:justify-start gap-3">
@@ -145,7 +150,10 @@ export default function Dashboard() {
               />
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                  Edu<span className="text-indigo-600 dark:text-indigo-400">Cor</span>
+                  Edu
+                  <span className="text-indigo-600 dark:text-indigo-400">
+                    Cor
+                  </span>
                 </h1>
                 <p className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -174,12 +182,18 @@ export default function Dashboard() {
                 {rol}
               </span>
             </div>
-
             <button
               onClick={handleCerrarSesion}
-              className="hidden sm:inline-flex min-h-[44px] items-center px-3.5 py-2 text-xs sm:text-sm font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-400 dark:hover:bg-rose-950/70 rounded-xl transition-all cursor-pointer active:scale-95"
+              className="hidden sm:inline-flex min-h-[44px] items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-400 dark:hover:bg-rose-950/70 rounded-xl transition-all cursor-pointer active:scale-95"
             >
-              Cerrar Sesión
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 640 640"
+                className="w-5 h-5 shrink-0 fill-current"
+                aria-hidden="true"
+              >
+                <path d="M224 160C241.7 160 256 145.7 256 128C256 110.3 241.7 96 224 96L160 96C107 96 64 139 64 192L64 448C64 501 107 544 160 544L224 544C241.7 544 256 529.7 256 512C256 494.3 241.7 480 224 480L160 480C142.3 480 128 465.7 128 448L128 192C128 174.3 142.3 160 160 160L224 160zM566.6 342.6C579.1 330.1 579.1 309.8 566.6 297.3L438.6 169.3C426.1 156.8 405.8 156.8 393.3 169.3C380.8 181.8 380.8 202.1 393.3 214.6L466.7 288L256 288C238.3 288 224 302.3 224 320C224 337.7 238.3 352 256 352L466.7 352L393.3 425.4C380.8 437.9 380.8 458.2 393.3 470.7C380.8 483.2 380.8 458.2 393.3 470.7C426.1 483.2 438.6 470.7 566.6 342.7z" />
+              </svg>
             </button>
           </div>
         </header>
@@ -192,11 +206,12 @@ export default function Dashboard() {
                 {rol === "alumno"
                   ? "Mis Materias"
                   : rol === "docente"
-                  ? "Aulas a Mi Cargo"
-                  : "Panel de Gestión Institucional"}
+                    ? "Aulas a Mi Cargo"
+                    : "Panel de Gestión Institucional"}
               </h2>
               <span className="text-xs text-slate-500 dark:text-slate-400">
-                {materias.length} {materias.length === 1 ? "materia activa" : "materias activas"}
+                {materias.length}{" "}
+                {materias.length === 1 ? "materia activa" : "materias activas"}
               </span>
             </div>
 
@@ -213,8 +228,18 @@ export default function Dashboard() {
                         {materia.nombre}
                       </h4>
                       <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                        <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        <svg
+                          className="w-3.5 h-3.5 text-slate-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
                         </svg>
                         Prof: {materia.docente}
                       </p>
@@ -222,12 +247,24 @@ export default function Dashboard() {
 
                     <div className="mt-4 pt-3 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-end">
                       <button
-                        onClick={() => router.push(`/dashboard/materia/${materia.id}`)}
+                        onClick={() =>
+                          router.push(`/dashboard/materia/${materia.id}`)
+                        }
                         className="w-full sm:w-auto min-h-[44px] px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white dark:bg-indigo-950/60 dark:text-indigo-300 dark:hover:bg-indigo-600 dark:hover:text-white transition-all duration-150 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         <span>Ingresar</span>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 5l7 7-7 7"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -236,7 +273,9 @@ export default function Dashboard() {
 
                 {materias.length === 0 && (
                   <div className="col-span-full py-12 text-center">
-                    <p className="text-sm text-slate-500">No estás inscrito en ninguna materia por el momento.</p>
+                    <p className="text-sm text-slate-500">
+                      No estás inscrito en ninguna materia por el momento.
+                    </p>
                   </div>
                 )}
               </div>
@@ -264,7 +303,9 @@ export default function Dashboard() {
                         Aula Virtual Activa
                       </span>
                       <button
-                        onClick={() => router.push(`/dashboard/materia/${materia.id}`)}
+                        onClick={() =>
+                          router.push(`/dashboard/materia/${materia.id}`)
+                        }
                         className="min-h-[44px] px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-sm hover:shadow transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         Gestionar
@@ -283,7 +324,8 @@ export default function Dashboard() {
                     Carga Masiva de Usuarios (CSV)
                   </h3>
                   <p className="text-xs sm:text-sm text-purple-800 dark:text-purple-300 mt-1">
-                    Sube el padrón oficial de alumnos y docentes para sincronizar el sistema.
+                    Sube el padrón oficial de alumnos y docentes para
+                    sincronizar el sistema.
                   </p>
                 </div>
 
