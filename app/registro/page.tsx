@@ -101,7 +101,6 @@ export default function Registro() {
           grado: grado,
           seccion: seccion,
           colegio_id: datosPadron.colegio_id || null,
-          contrasena: password,
           dni: dni.trim()
         }
       }
