@@ -42,13 +42,13 @@ function ContenidoSala() {
         const grado = matData.grado || "General";
         const seccion = matData.seccion || "Unica";
         const nomLimpio = matData.nombre.replace(/[^a-zA-Z0-9]/g, "");
-        
+
         setRoomHash(`EduCor_Col${colId}_Grado${grado}_Sec${seccion}_Mat${id}_${nomLimpio}`);
       } else {
         setMateriaNombre(`Materia ${id}`);
         setRoomHash(`EduCorAulaContingenciaMateria${id.replace(/[^a-zA-Z0-9]/g, "")}`);
       }
-      
+
       setCargando(false);
     };
 
@@ -57,9 +57,9 @@ function ContenidoSala() {
 
   // Memorizamos las configuraciones para evitar el bucle infinito de renderizados en Jitsi
   const jitsiConfig = useMemo(() => ({
-    startWithAudioMuted: rol === "alumno", 
+    startWithAudioMuted: rol === "alumno",
     startWithVideoMuted: true,
-    startAudioOnly: true, 
+    startAudioOnly: true,
     prejoinPageEnabled: false,
     disableDeepLinking: true,
     resolution: 360,
@@ -74,7 +74,7 @@ function ContenidoSala() {
 
   const jitsiUser = useMemo(() => ({
     displayName: usuario,
-    email: `${usuario.replace(/\s+/g, '').toLowerCase()}@educor.local` 
+    email: `${usuario.replace(/\s+/g, '').toLowerCase()}@educor.local`
   }), [usuario]);
 
   // Memorizamos las funciones callback pasadas a Jitsi
@@ -104,58 +104,86 @@ function ContenidoSala() {
 
   if (cargando || !roomHash) {
     return (
-      <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center bg-slate-50 text-slate-600 px-4">
-        <Image src="/EduCor.png" alt="EduCor Logo" width={64} height={64} priority className="h-16 w-16 object-contain animate-pulse mb-4" />
-        <div className="h-7 w-7 animate-spin rounded-full border-3 border-indigo-600 border-t-transparent mb-3" />
-        <p className="text-sm sm:text-base font-medium">Generando túnel seguro...</p>
+      <div className="relative min-h-dvh w-full flex flex-col items-center justify-center overflow-hidden bg-slate-50 px-4 text-slate-600 dark:bg-slate-950 dark:text-slate-300">
+        <div
+          className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/10 blur-3xl"
+          aria-hidden="true"
+        />
+        <div className="relative flex flex-col items-center">
+          <Image src="/EduCor.png" alt="EduCor Logo" width={64} height={64} priority className="mb-4 h-16 w-16 animate-pulse object-contain" />
+          <div className="mb-3 h-7 w-7 animate-spin rounded-full border-3 border-indigo-600 border-t-transparent" />
+          <p className="text-sm font-medium sm:text-base">Generando túnel seguro...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] w-full flex flex-col bg-slate-50 dark:bg-slate-950">
-      
-      <header className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3.5 sm:p-4 border-b border-slate-200/80 dark:border-slate-800 shadow-sm z-10">
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <button 
-            onClick={() => router.push(`/dashboard/materia/${id}`)} 
-            className="min-h-[44px] text-xs sm:text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-semibold transition-colors cursor-pointer"
+    <div className="relative flex min-h-dvh w-full flex-col overflow-hidden bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100">
+      <div
+        className="pointer-events-none absolute -top-40 left-1/2 h-80 w-full max-w-4xl -translate-x-1/2 rounded-full bg-indigo-500/10 blur-3xl"
+        aria-hidden="true"
+      />
+
+      <header className="relative z-10 w-full border-b border-slate-200/80 bg-white/95 shadow-sm backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 p-3.5 sm:flex-row sm:items-center sm:justify-between sm:p-4">
+          <div className="flex w-full items-center gap-3 sm:w-auto">
+          <button
+            onClick={() => router.push(`/dashboard/materia/${id}`)}
+            className="min-h-[44px] shrink-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-indigo-300 dark:hover:bg-slate-700"
           >
             ← Volver
           </button>
-          <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block mx-1"></div>
-          <h1 className="text-sm sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
-            Clase en Vivo: {materiaNombre}
-          </h1>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <span className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium">{usuario}</span>
-          <span className="text-[10px] sm:text-xs bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">{rol}</span>
+          <div className="hidden h-8 w-px bg-slate-200 sm:block dark:bg-slate-700" />
+          <Image
+            src="/EduCor.png"
+            alt="EduCor Logo"
+            width={40}
+            height={40}
+            priority
+            className="hidden h-10 w-10 shrink-0 object-contain sm:block"
+          />
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 sm:text-xs">
+              Aula virtual
+            </p>
+            <h1 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white sm:text-lg">
+              <span className="h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-rose-500" />
+              <span className="truncate">Clase en Vivo: {materiaNombre}</span>
+            </h1>
+          </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 pl-1 sm:justify-end sm:pl-0">
+          <span className="truncate text-xs font-medium text-slate-600 dark:text-slate-300 sm:text-sm">{usuario}</span>
+          <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 sm:text-xs">
+            {rol}
+          </span>
+          </div>
         </div>
       </header>
 
       {salaBloqueada ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-          <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 max-w-md w-full">
-            <div className="w-16 h-16 bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-              🔒
-            </div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Sala no iniciada</h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
-              El docente aún no ha ingresado al aula. Por razones de seguridad, la sala virtual permanece cerrada hasta que el profesor inicie la clase.
-            </p>
-            <button
-              onClick={() => router.push(`/dashboard/materia/${id}`)}
-              className="w-full min-h-[44px] bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer"
-            >
-              Volver al Aula
-            </button>
+        <div className="relative flex flex-1 flex-col items-center justify-center p-5 text-center sm:p-8">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200/80 bg-white/95 p-6 shadow-xl shadow-slate-900/5 backdrop-blur-sm sm:p-8 dark:border-slate-800 dark:bg-slate-900/95">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-100 text-3xl text-rose-600 dark:bg-rose-900/30 dark:text-rose-400">
+            🔒
+          </div>
+          <h2 className="mb-2 text-xl font-bold text-slate-900 dark:text-white">Sala no iniciada</h2>
+          <p className="mb-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            El docente aún no ha ingresado al aula. Por razones de seguridad, la sala virtual permanece cerrada hasta que el profesor inicie la clase.
+          </p>
+          <button
+            onClick={() => router.push(`/dashboard/materia/${id}`)}
+            className="min-h-12 w-full cursor-pointer rounded-full bg-linear-to-r from-indigo-500 via-indigo-600 to-indigo-700 px-4 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/25 transition-all hover:from-indigo-600 hover:to-indigo-800 hover:shadow-lg hover:shadow-indigo-500/35 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Volver al Aula
+          </button>
           </div>
         </div>
       ) : (
-        <div className="flex-1 w-full bg-slate-900 relative">
+        <div className="relative mx-auto flex min-h-[420px] w-full max-w-7xl flex-1 p-2 sm:p-4">
+          <div className="relative flex min-h-0 w-full flex-1 overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-xl shadow-slate-900/10 dark:border-slate-800">
           <JitsiMeeting
             domain="meet.jit.si"
             roomName={roomHash}
@@ -165,6 +193,7 @@ function ContenidoSala() {
             onApiReady={handleApiReady}
             getIFrameRef={handleIFrameRef}
           />
+          </div>
         </div>
       )}
     </div>
@@ -176,9 +205,15 @@ export default function SalaVirtual() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center bg-slate-50 text-slate-600 px-4">
-          <Image src="/EduCor.png" alt="EduCor Logo" width={56} height={56} priority className="h-14 w-14 object-contain animate-pulse mb-3" />
-          <p className="text-sm font-medium">Preparando entorno virtual...</p>
+        <div className="relative flex min-h-dvh w-full flex-col items-center justify-center overflow-hidden bg-slate-50 px-4 text-slate-600 dark:bg-slate-950 dark:text-slate-300">
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/10 blur-3xl"
+            aria-hidden="true"
+          />
+          <div className="relative flex flex-col items-center">
+            <Image src="/EduCor.png" alt="EduCor Logo" width={56} height={56} priority className="mb-3 h-14 w-14 animate-pulse object-contain" />
+            <p className="text-sm font-medium">Preparando entorno virtual...</p>
+          </div>
         </div>
       }
     >

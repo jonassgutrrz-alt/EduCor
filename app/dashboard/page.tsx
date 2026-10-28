@@ -9,6 +9,8 @@ interface Materia {
   id: number;
   nombre: string;
   docente: string;
+  grado?: string | null;
+  seccion?: string | null;
   tareasPendientes: number;
 }
 
@@ -42,7 +44,7 @@ export default function Dashboard() {
           .select(
             `
             materias (
-              id, nombre,
+              id, nombre, grado, seccion,
               usuarios ( nombre_completo )
             )
           `,
@@ -54,6 +56,8 @@ export default function Dashboard() {
             const materiaData = insc.materias as unknown as {
               id: number;
               nombre: string;
+              grado?: string | null;
+              seccion?: string | null;
               usuarios: { nombre_completo: string } | null;
             };
 
@@ -61,6 +65,8 @@ export default function Dashboard() {
               id: materiaData.id,
               nombre: materiaData.nombre,
               docente: materiaData.usuarios?.nombre_completo || "Sin asignar",
+              grado: materiaData.grado || null,
+              seccion: materiaData.seccion || null,
               tareasPendientes: 0,
             };
           });
@@ -69,16 +75,23 @@ export default function Dashboard() {
       } else if (roleStored === "docente") {
         const { data } = await supabase
           .from("materias")
-          .select("id, nombre")
+          .select("id, nombre, grado, seccion")
           .eq("docente_id", userId);
 
         if (data) {
           const materiasFormateadas = data.map((mat) => {
-            const matData = mat as unknown as { id: number; nombre: string };
+            const matData = mat as unknown as {
+              id: number;
+              nombre: string;
+              grado?: string | null;
+              seccion?: string | null;
+            };
             return {
               id: matData.id,
               nombre: matData.nombre,
               docente: "Vos (Docente)",
+              grado: matData.grado || null,
+              seccion: matData.seccion || null,
               tareasPendientes: 0,
             };
           });
@@ -123,7 +136,6 @@ export default function Dashboard() {
           width={64}
           height={64}
           priority
-          // className="h-16 w-16 object-contain animate-pulse mb-4"
         />
         <div className="h-7 w-7 animate-spin rounded-full border-3 border-indigo-600 border-t-transparent mb-3" />
         <p className="text-sm sm:text-base font-medium text-slate-600">
@@ -146,7 +158,6 @@ export default function Dashboard() {
                 width={44}
                 height={44}
                 priority
-                // className="h-10 w-10 sm:h-11 sm:w-11 object-contain drop-shadow-sm transition-transform duration-200 hover:scale-105"
               />
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
@@ -180,6 +191,13 @@ export default function Dashboard() {
               </span>
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">
                 {rol}
+              </span>
+              <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+                {rol === "alumno"
+                  ? materias[0]?.grado
+                    ? `${materias[0].grado}° ${materias[0].seccion || ""}`
+                    : "Sin grado asignado"
+                  : null}
               </span>
             </div>
             <button
@@ -294,7 +312,7 @@ export default function Dashboard() {
                         {materia.nombre}
                       </h3>
                       <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                        {materia.docente}
+                        Curso: {materia.grado ? `${materia.grado}° ${materia.seccion || ""}`.trim() : "Sin curso asignado"}
                       </p>
                     </div>
 

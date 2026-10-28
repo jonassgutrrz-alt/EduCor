@@ -28,6 +28,7 @@ interface Tarea {
   descripcion: string;
   url_archivo: string | null;
   fecha: string;
+  editado_en?: string | null;
 }
 
 interface Notificacion {
@@ -61,6 +62,30 @@ interface MensajeForo {
   fecha: string;
   editado?: boolean;
 }
+
+// Funciones auxiliares fuera del componente
+const formatearFechaHora = (fechaStr?: string | null) => {
+  if (!fechaStr) return "";
+  const d = new Date(fechaStr);
+  if (isNaN(d.getTime())) return fechaStr;
+  return `${d.toLocaleDateString("es-AR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })} a las ${d.toLocaleTimeString("es-AR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  })} hs`;
+};
+
+const generarRutaArchivo = (carpeta: string, nombreOriginal: string) => {
+  return `${carpeta}/${Date.now()}_${nombreOriginal}`;
+};
+
+const obtenerFechaActualISO = () => {
+  return new Date().toISOString();
+};
 
 function ContenidoMateria() {
   const router = useRouter();
@@ -114,7 +139,7 @@ function ContenidoMateria() {
     try {
       localStorage.setItem(clave, JSON.stringify(ids));
     } catch {
-      // Las notificaciones siguen funcionando durante esta sesión aunque el almacenamiento esté bloqueado.
+      // Manejo silencioso de almacenamiento
     }
   };
 
@@ -173,6 +198,12 @@ function ContenidoMateria() {
   const [nuevaTareaTitulo, setNuevaTareaTitulo] = useState("");
   const [nuevaTareaDesc, setNuevaTareaDesc] = useState("");
   const [archivoNuevaTarea, setArchivoNuevaTarea] = useState<File | null>(null);
+
+  // Estado para la edición de tareas (Docente)
+  const [editandoTareaId, setEditandoTareaId] = useState<number | null>(null);
+  const [editTareaTitulo, setEditTareaTitulo] = useState("");
+  const [editTareaDesc, setEditTareaDesc] = useState("");
+  const [editTareaArchivo, setEditTareaArchivo] = useState<File | null>(null);
 
   // Entregas (Alumno)
   const [misEntregas, setMisEntregas] = useState<EntregaAlumno[]>([]);
@@ -274,7 +305,7 @@ function ContenidoMateria() {
           id: `m-${m.id}`,
           tipo: "Material de Estudio",
           texto: m.titulo,
-          fecha: m.fecha || new Date().toISOString(),
+          fecha: m.fecha || obtenerFechaActualISO(),
         }),
       );
       resAvisos.data?.forEach((a) =>
@@ -340,7 +371,7 @@ function ContenidoMateria() {
 
     let urlArchivo = null;
     if (archivoNuevaTarea) {
-      const fileName = `tareas/${Date.now()}_${archivoNuevaTarea.name}`;
+      const fileName = generarRutaArchivo("tareas", archivoNuevaTarea.name);
       const { error: uploadError } = await supabase.storage
         .from("archivos-educor")
         .upload(fileName, archivoNuevaTarea);
@@ -384,6 +415,103 @@ function ContenidoMateria() {
     }
   };
 
+  // EDITAR Y BORRAR TAREAS (Docente)
+  const handleIniciarEdicionTarea = (t: Tarea) => {
+    setEditandoTareaId(t.id);
+    setEditTareaTitulo(t.titulo);
+    setEditTareaDesc(t.descripcion);
+    setEditTareaArchivo(null);
+  };
+
+  const handleGuardarEdicionTarea = async (
+    idTarea: number,
+    urlArchivoActual: string | null,
+  ) => {
+    if (!editTareaTitulo.trim() || !editTareaDesc.trim()) {
+      showToast("El título y las instrucciones son obligatorios.", "warning");
+      return;
+    }
+
+    let urlArchivo = urlArchivoActual;
+    if (editTareaArchivo) {
+      const fileName = generarRutaArchivo("tareas", editTareaArchivo.name);
+      const { error: uploadError } = await supabase.storage
+        .from("archivos-educor")
+        .upload(fileName, editTareaArchivo);
+      if (uploadError) {
+        showToast("Error al subir el nuevo archivo adjunto.", "error");
+        return;
+      }
+      const { data: urlData } = supabase.storage
+        .from("archivos-educor")
+        .getPublicUrl(fileName);
+      urlArchivo = urlData.publicUrl;
+    }
+
+    const fechaEdicion = obtenerFechaActualISO();
+
+    let { error } = await supabase
+      .from("tareas")
+      .update({
+        titulo: editTareaTitulo,
+        descripcion: editTareaDesc,
+        url_archivo: urlArchivo,
+        editado_en: fechaEdicion,
+      })
+      .eq("id", idTarea);
+
+    if (error) {
+      const fallback = await supabase
+        .from("tareas")
+        .update({
+          titulo: editTareaTitulo,
+          descripcion: editTareaDesc,
+          url_archivo: urlArchivo,
+        })
+        .eq("id", idTarea);
+      error = fallback.error;
+    }
+
+    if (!error) {
+      setTareas((prev) =>
+        prev.map((t) =>
+          t.id === idTarea
+            ? {
+                ...t,
+                titulo: editTareaTitulo,
+                descripcion: editTareaDesc,
+                url_archivo: urlArchivo,
+                editado_en: fechaEdicion,
+              }
+            : t,
+        ),
+      );
+      setEditandoTareaId(null);
+      showToast("Tarea actualizada correctamente.", "success");
+    } else {
+      showToast("Error al actualizar la tarea.", "error");
+    }
+  };
+
+  const handleBorrarTarea = (idTarea: number) => {
+    showConfirm(
+      "¿Estás seguro de que deseas eliminar esta tarea?",
+      async () => {
+        const { error } = await supabase
+          .from("tareas")
+          .delete()
+          .eq("id", idTarea);
+        if (!error) {
+          setTareas((prev) => prev.filter((t) => t.id !== idTarea));
+          showToast("Tarea eliminada correctamente.", "info");
+        } else {
+          showToast("Error al eliminar la tarea.", "error");
+        }
+      },
+      "Eliminar Tarea",
+    );
+  };
+
   // ENTREGAR TAREA (Alumno)
   const handleDesadjuntar = () => {
     setArchivo(null);
@@ -406,7 +534,7 @@ function ContenidoMateria() {
         showToast("El archivo supera el límite permitido de 5 MB.", "warning");
         return;
       }
-      const fileName = `entregas/${Date.now()}_${archivo.name}`;
+      const fileName = generarRutaArchivo("entregas", archivo.name);
       const { error: uploadError } = await supabase.storage
         .from("archivos-educor")
         .upload(fileName, archivo);
@@ -449,7 +577,7 @@ function ContenidoMateria() {
       setMisEntregas([data[0] as unknown as EntregaAlumno, ...misEntregas]);
       setRespuestaTexto("");
       handleDesadjuntar();
-      setTareaSeleccionada(null); // Cierra el formulario de la tarea específica
+      setTareaSeleccionada(null);
     } else {
       showToast("Error al registrar la entrega.", "error");
     }
@@ -476,7 +604,7 @@ function ContenidoMateria() {
           e.id === idEntrega ? { ...e, nota, devolucion } : e,
         ),
       );
-      setCalificacionEditable(null); // Bloquea la edición nuevamente
+      setCalificacionEditable(null);
       showToast("¡Calificación guardada y asegurada!", "success");
     } else {
       showToast("Error al guardar la calificación.", "error");
@@ -533,7 +661,7 @@ function ContenidoMateria() {
       return;
     }
     const fileExt = nuevoMaterial.name.split(".").pop();
-    const filePath = `materiales/${Date.now()}_${nuevoMaterial.name}`;
+    const filePath = generarRutaArchivo("materiales", nuevoMaterial.name);
     const { error: uploadError } = await supabase.storage
       .from("archivos-educor")
       .upload(filePath, nuevoMaterial);
@@ -564,7 +692,7 @@ function ContenidoMateria() {
         id: `m-${data[0].id}`,
         tipo: "Material de Estudio",
         texto: data[0].titulo,
-        fecha: data[0].fecha || new Date().toISOString(),
+        fecha: data[0].fecha || obtenerFechaActualISO(),
       });
       setNuevoMaterial(null);
       if (fileMaterialRef.current) fileMaterialRef.current.value = "";
@@ -854,157 +982,252 @@ function ContenidoMateria() {
                 const entregaRealizada = misEntregas.find(
                   (e) => e.tarea_id === t.id,
                 );
+                const estaEditando = editandoTareaId === t.id;
+
                 return (
                   <div
                     key={t.id}
                     className="p-4 border border-slate-200/80 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-800/40 space-y-3"
                   >
-                    <div className="flex flex-wrap justify-between items-start gap-2">
-                      <h3 className="min-w-0 break-words font-bold text-slate-800 dark:text-slate-100 text-sm">
-                        {t.titulo}
-                      </h3>
-                      {rol === "alumno" &&
-                        (entregaRealizada ? (
-                          <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-bold uppercase tracking-wide">
-                            Entregada
-                          </span>
-                        ) : (
-                          <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-bold uppercase tracking-wide">
-                            Pendiente
-                          </span>
-                        ))}
-                    </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
-                      {t.descripcion}
-                    </p>
-                    {t.url_archivo && (
-                      <a
-                        href={t.url_archivo}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-block text-xs bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-100 transition-colors"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-3 h-3 shrink-0 fill-current"
-                          viewBox="0 0 512 512"
-                        >
-                          <path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0-201.4 201.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3 448 192c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 96C35.8 96 0 131.8 0 176L0 432c0 44.2 35.8 80 80 80l256 0c44.2 0 80-35.8 80-80l0-80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 80c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l80 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 96z" />
-                        </svg>{" "}
-                        Abrir
-                      </a>
-                    )}
-
-                    {/* Botón del Alumno para desplegar formulario */}
-                    {rol === "alumno" &&
-                      !entregaRealizada &&
-                      tareaSeleccionada !== t.id && (
-                        <div className="pt-2 border-t border-slate-200 dark:border-slate-700 mt-2">
-                          <button
-                            onClick={() => setTareaSeleccionada(t.id)}
-                            className="text-xs bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer"
-                          >
-                            Realizar Entrega
-                          </button>
-                        </div>
-                      )}
-
-                    {/* Formulario de Entrega (Se abre bajo la tarea seleccionada) */}
-                    {tareaSeleccionada === t.id && (
-                      <form
-                        onSubmit={handleEnviarTarea}
-                        className="mt-4 p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl space-y-3 shadow-inner"
-                      >
-                        <div className="flex border-b border-slate-200 dark:border-slate-700 pb-2 gap-4">
-                          <button
-                            type="button"
-                            onClick={() => setOpcionEntrega("archivo")}
-                            className={`text-xs font-bold pb-1 cursor-pointer ${opcionEntrega === "archivo" ? "text-indigo-600 border-b-2 border-indigo-600" : "text-slate-500"}`}
-                          >
-                            Subir Archivo
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setOpcionEntrega("texto")}
-                            className={`text-xs font-bold pb-1 cursor-pointer ${opcionEntrega === "texto" ? "text-indigo-600 border-b-2 border-indigo-600" : "text-slate-500"}`}
-                          >
-                            Escribir Texto
-                          </button>
-                        </div>
-
-                        {opcionEntrega === "archivo" ? (
-                          <div className="flex flex-col gap-2">
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              onChange={(e) =>
-                                setArchivo(e.target.files?.[0] || null)
+                    {estaEditando ? (
+                      /* Formulario de Edición de Tarea */
+                      <div className="space-y-3 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <h4 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                          Editar Tarea
+                        </h4>
+                        <input
+                          type="text"
+                          value={editTareaTitulo}
+                          onChange={(e) => setEditTareaTitulo(e.target.value)}
+                          placeholder="Título de la tarea"
+                          className="w-full text-sm p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                        <textarea
+                          value={editTareaDesc}
+                          onChange={(e) => setEditTareaDesc(e.target.value)}
+                          placeholder="Instrucciones de la tarea"
+                          rows={3}
+                          className="w-full text-sm p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                        <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                          <input
+                            type="file"
+                            onChange={(e) =>
+                              setEditTareaArchivo(e.target.files?.[0] || null)
+                            }
+                            className="text-xs flex-1 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700"
+                          />
+                          <div className="flex gap-2 w-full sm:w-auto">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleGuardarEdicionTarea(t.id, t.url_archivo)
                               }
-                              className="text-xs file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700"
-                            />
-                            {archivo && (
-                              <button
-                                type="button"
-                                onClick={handleDesadjuntar}
-                                className="self-start text-xs text-rose-600 font-semibold cursor-pointer"
-                              >
-                                Desadjuntar
-                              </button>
+                              className="bg-emerald-600 text-white text-xs px-3.5 py-1.5 rounded-lg font-bold hover:bg-emerald-700 transition-colors cursor-pointer"
+                            >
+                              Guardar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditandoTareaId(null)}
+                              className="bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs px-3.5 py-1.5 rounded-lg font-bold hover:bg-slate-400 transition-colors cursor-pointer"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Vista Normal de la Tarea */
+                      <>
+                        <div className="flex flex-wrap justify-between items-start gap-2">
+                          <div>
+                            <h3 className="min-w-0 break-words font-bold text-slate-800 dark:text-slate-100 text-sm">
+                              {t.titulo}
+                            </h3>
+                            {/* Fecha y hora exacta de publicación y edición */}
+                            <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                              <span>
+                                Publicado: {formatearFechaHora(t.fecha)}
+                              </span>
+                              {t.editado_en && (
+                                <span className="italic text-indigo-600 dark:text-indigo-400 font-medium">
+                                  • Editado: {formatearFechaHora(t.editado_en)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {rol === "alumno" &&
+                              (entregaRealizada ? (
+                                <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-bold uppercase tracking-wide">
+                                  Entregada
+                                </span>
+                              ) : (
+                                <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-bold uppercase tracking-wide">
+                                  Pendiente
+                                </span>
+                              ))}
+
+                            {/* Acciones del Docente: Editar / Borrar */}
+                            {rol === "docente" && (
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleIniciarEdicionTarea(t)}
+                                  className="text-xs bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 hover:bg-indigo-100 px-2.5 py-1 rounded-lg font-semibold cursor-pointer transition-colors"
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleBorrarTarea(t.id)}
+                                  className="text-xs bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 hover:bg-rose-100 px-2.5 py-1 rounded-lg font-semibold cursor-pointer transition-colors"
+                                >
+                                  Borrar
+                                </button>
+                              </div>
                             )}
                           </div>
-                        ) : (
-                          <textarea
-                            value={respuestaTexto}
-                            onChange={(e) => setRespuestaTexto(e.target.value)}
-                            rows={3}
-                            className="w-full text-xs p-3 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                            placeholder="Escribe tu respuesta aquí..."
-                          />
+                        </div>
+
+                        <p className="text-xs text-slate-600 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
+                          {t.descripcion}
+                        </p>
+
+                        {t.url_archivo && (
+                          <a
+                            href={t.url_archivo}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 text-xs bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-100 transition-colors"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="w-3 h-3 shrink-0 fill-current"
+                              viewBox="0 0 512 512"
+                            >
+                              <path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0-201.4 201.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3 448 192c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 96C35.8 96 0 131.8 0 176L0 432c0 44.2 35.8 80 80 80l256 0c44.2 0 80-35.8 80-80l0-80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 80c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l80 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 96z" />
+                            </svg>{" "}
+                            Abrir Adjunto
+                          </a>
                         )}
 
-                        <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                          <button
-                            type="submit"
-                            className="w-full sm:w-auto bg-emerald-600 text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
-                          >
-                            Enviar Trabajo
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setTareaSeleccionada(null)}
-                            className="w-full sm:w-auto bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300 text-xs px-4 py-2 rounded-lg font-bold hover:bg-slate-300 transition-colors cursor-pointer"
-                          >
-                            Cancelar
-                          </button>
-                        </div>
-                      </form>
-                    )}
+                        {/* Botón del Alumno para desplegar formulario */}
+                        {rol === "alumno" &&
+                          !entregaRealizada &&
+                          tareaSeleccionada !== t.id && (
+                            <div className="pt-2 border-t border-slate-200 dark:border-slate-700 mt-2">
+                              <button
+                                onClick={() => setTareaSeleccionada(t.id)}
+                                className="text-xs bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer"
+                              >
+                                Realizar Entrega
+                              </button>
+                            </div>
+                          )}
 
-                    {/* Feedback del Docente visible para el alumno */}
-                    {rol === "alumno" && entregaRealizada && (
-                      <div className="mt-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                            Calificación del Docente
-                          </span>
-                          <span
-                            className={`text-xs font-bold px-2 py-0.5 rounded ${entregaRealizada.nota ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}
+                        {/* Formulario de Entrega (Se abre bajo la tarea seleccionada) */}
+                        {tareaSeleccionada === t.id && (
+                          <form
+                            onSubmit={handleEnviarTarea}
+                            className="mt-4 p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl space-y-3 shadow-inner"
                           >
-                            {entregaRealizada.nota
-                              ? `Nota: ${entregaRealizada.nota}`
-                              : "Pendiente"}
-                          </span>
-                        </div>
-                        {entregaRealizada.devolucion ? (
-                          <p className="text-xs text-slate-700 dark:text-slate-300 italic mt-1">
-                            &quot;{entregaRealizada.devolucion}&quot;
-                          </p>
-                        ) : (
-                          <p className="text-xs text-slate-400 italic mt-1">
-                            El docente aún no ha dejado comentarios.
-                          </p>
+                            <div className="flex border-b border-slate-200 dark:border-slate-700 pb-2 gap-4">
+                              <button
+                                type="button"
+                                onClick={() => setOpcionEntrega("archivo")}
+                                className={`text-xs font-bold pb-1 cursor-pointer ${opcionEntrega === "archivo" ? "text-indigo-600 border-b-2 border-indigo-600" : "text-slate-500"}`}
+                              >
+                                Subir Archivo
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setOpcionEntrega("texto")}
+                                className={`text-xs font-bold pb-1 cursor-pointer ${opcionEntrega === "texto" ? "text-indigo-600 border-b-2 border-indigo-600" : "text-slate-500"}`}
+                              >
+                                Escribir Texto
+                              </button>
+                            </div>
+
+                            {opcionEntrega === "archivo" ? (
+                              <div className="flex flex-col gap-2">
+                                <input
+                                  type="file"
+                                  ref={fileInputRef}
+                                  onChange={(e) =>
+                                    setArchivo(e.target.files?.[0] || null)
+                                  }
+                                  className="text-xs file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700"
+                                />
+                                {archivo && (
+                                  <button
+                                    type="button"
+                                    onClick={handleDesadjuntar}
+                                    className="self-start text-xs text-rose-600 font-semibold cursor-pointer"
+                                  >
+                                    Desadjuntar
+                                  </button>
+                                )}
+                              </div>
+                            ) : (
+                              <textarea
+                                value={respuestaTexto}
+                                onChange={(e) =>
+                                  setRespuestaTexto(e.target.value)
+                                }
+                                rows={3}
+                                className="w-full text-xs p-3 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                placeholder="Escribe tu respuesta aquí..."
+                              />
+                            )}
+
+                            <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                              <button
+                                type="submit"
+                                className="w-full sm:w-auto bg-emerald-600 text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
+                              >
+                                Enviar Trabajo
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setTareaSeleccionada(null)}
+                                className="w-full sm:w-auto bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300 text-xs px-4 py-2 rounded-lg font-bold hover:bg-slate-300 transition-colors cursor-pointer"
+                              >
+                                Cancelar
+                              </button>
+                            </div>
+                          </form>
                         )}
-                      </div>
+
+                        {/* Feedback del Docente visible para el alumno */}
+                        {rol === "alumno" && entregaRealizada && (
+                          <div className="mt-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg">
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                Calificación del Docente
+                              </span>
+                              <span
+                                className={`text-xs font-bold px-2 py-0.5 rounded ${entregaRealizada.nota ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}
+                              >
+                                {entregaRealizada.nota
+                                  ? `Nota: ${entregaRealizada.nota}`
+                                  : "Pendiente"}
+                              </span>
+                            </div>
+                            {entregaRealizada.devolucion ? (
+                              <p className="text-xs text-slate-700 dark:text-slate-300 italic mt-1">
+                                &quot;{entregaRealizada.devolucion}&quot;
+                              </p>
+                            ) : (
+                              <p className="text-xs text-slate-400 italic mt-1">
+                                El docente aún no ha dejado comentarios.
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 );

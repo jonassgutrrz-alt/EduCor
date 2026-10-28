@@ -15,40 +15,52 @@ export default function Login() {
   const { showToast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!email || !password) {
-      showToast("Por favor completa todos los campos.", "warning");
+  if (!email || !password) {
+    alert("Por favor completa todos los campos.");
+    return;
+  }
+
+  setCargando(true);
+
+  try {
+    // 1. Iniciar sesión criptográficamente con Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password: password,
+    });
+
+    if (authError || !authData.user) {
+      alert("Credenciales incorrectas. Verifica tu email y contraseña.");
+      setCargando(false);
       return;
     }
 
-    setCargando(true);
+    // 2. Con el token autenticado, RLS aprueba la lectura a la tabla usuarios
+    const { data: userData, error: userError } = await supabase
+      .from("usuarios")
+      .select("*")
+      .eq("id", authData.user.id)
+      .single();
 
-    try {
-      const { data, error } = await supabase
-        .from("usuarios")
-        .select("*")
-        .eq("email", email.trim().toLowerCase())
-        .eq("contrasena", password)
-        .single();
-
-      if (error || !data) {
-        showToast("Credenciales incorrectas. Verifica tu email y contraseña.", "error");
-        setCargando(false);
-        return;
-      }
-
-      sessionStorage.setItem("usuario_id", String(data.id));
-      sessionStorage.setItem("usuario", data.nombre_completo);
-      sessionStorage.setItem("rol", data.rol);
-
-      showToast(`¡Bienvenido de vuelta, ${data.nombre_completo}!`, "success");
-      router.push("/dashboard");
-    } catch {
-      showToast("Error de conexión. Intente nuevamente.", "error");
+    if (userError || !userData) {
+      alert("Error al cargar los datos del perfil.");
       setCargando(false);
+      return;
     }
-  };
+
+    // 3. Establecer las variables de sesión para el frontend
+    sessionStorage.setItem("usuario_id", String(userData.id));
+    sessionStorage.setItem("usuario", userData.nombre_completo);
+    sessionStorage.setItem("rol", userData.rol);
+
+    router.push("/dashboard");
+  } catch {
+    alert("Error de conexión. Intente nuevamente.");
+    setCargando(false);
+  }
+};
 
   return (
     <div className="relative min-h-dvh w-full flex flex-col justify-center items-center px-4 py-8 sm:px-6 md:px-8 lg:px-12 bg-slate-50 overflow-x-hidden dark:bg-slate-950">
