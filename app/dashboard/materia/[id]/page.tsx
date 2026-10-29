@@ -253,7 +253,7 @@ function ContenidoMateria() {
         const docName = (
           matData.usuarios as unknown as { nombre_completo: string }
         )?.nombre_completo;
-        setMateriaDocente(docName || "Docente Asignado");
+        setMateriaDocente(docName || "Sin Asignar");
       }
 
       // 2. Cargar todo el contenido de la materia
@@ -798,7 +798,7 @@ function ContenidoMateria() {
           type="button"
           onClick={() => router.push("/dashboard")}
           aria-label="Volver al dashboard"
-          className="flex items-center gap-3 cursor-pointer text-left"
+          className="flex items-center gap-2 cursor-pointer text-left"
         >
           <span className="min-h-[44px] text-xs sm:text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-semibold flex items-center gap-1.5 transition-colors">
             ←
@@ -816,7 +816,15 @@ function ContenidoMateria() {
           </h1>
         </button>
 
-        <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end sm:gap-4">
+        <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end sm:gap-4 border-t-2 sm:border-t-0 border-slate-100 dark:border-slate-800 pt-2 sm:pt-0">
+          <div className="flex items-center gap-2">
+            <span className="max-w-[55vw] truncate text-xs sm:max-w-none sm:text-sm text-slate-600 dark:text-slate-300 font-medium">
+              {usuario}
+            </span>
+            <span className="text-[10px] sm:text-xs bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
+              {rol}
+            </span>
+          </div>
           {/* Notificaciones del aula */}
           <div className="relative">
             {rol === "alumno" && (
@@ -829,7 +837,7 @@ function ContenidoMateria() {
                 type="button"
                 aria-label="Abrir notificaciones"
                 aria-expanded={mostrarNotificaciones}
-                className="relative flex h-11 w-11 items-center justify-center rounded-full p-2 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+                className="relative flex h-10 w-10 items-center justify-center rounded-full p-2 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                   <path d="M320 64C302.3 64 288 78.3 288 96L288 99.2C215 114 160 178.6 160 256L160 277.7C160 325.8 143.6 372.5 113.6 410.1L103.8 422.3C98.7 428.6 96 436.4 96 444.5C96 464.1 111.9 480 131.5 480L508.4 480C528 480 543.9 464.1 543.9 444.5C543.9 436.4 541.2 428.6 536.1 422.3L526.3 410.1C496.4 372.5 480 325.8 480 277.7L480 256C480 178.6 425 114 352 99.2L352 96C352 78.3 337.7 64 320 64zM258 528C265.1 555.6 290.2 576 320 576C349.8 576 374.9 555.6 382 528L258 528z" />
@@ -886,16 +894,7 @@ function ContenidoMateria() {
               </div>
             )}
           </div>
-
-          <div className="flex items-center gap-2">
-            <span className="max-w-[55vw] truncate text-xs sm:max-w-none sm:text-sm text-slate-600 dark:text-slate-300 font-medium">
-              {usuario}
-            </span>
-            <span className="text-[10px] sm:text-xs bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
-              {rol}
-            </span>
           </div>
-        </div>
       </header>
 
       <main className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
@@ -906,7 +905,7 @@ function ContenidoMateria() {
               {materiaNombre}
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Docente: {materiaDocente}
+              Prof: {materiaDocente}
             </p>
           </div>
           <div className="bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-900 p-4 rounded-xl flex flex-col items-center w-full md:w-64 shrink-0">
