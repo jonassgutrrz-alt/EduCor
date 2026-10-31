@@ -908,7 +908,7 @@ function ContenidoMateria() {
               Prof: {materiaDocente}
             </p>
           </div>
-          <div className="bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-900 p-4 rounded-xl flex flex-col items-center w-full md:w-64 shrink-0">
+          {/* <div className="bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-900 p-4 rounded-xl flex flex-col items-center w-full md:w-64 shrink-0">
             <span className="flex items-center gap-2 text-indigo-900 dark:text-indigo-300 font-bold mb-2 text-sm">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>{" "}
               Clase en Vivo
@@ -919,7 +919,7 @@ function ContenidoMateria() {
             >
               Unirse a la Sala
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* MÓDULO DE ASIGNACIONES (TAREAS) */}

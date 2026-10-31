@@ -198,7 +198,7 @@ export default function Dashboard() {
               <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
                 {rol === "alumno"
                   ? materias[0]?.grado
-                    ? `${materias[0].grado}° ${materias[0].seccion || ""}`
+                    ? `${materias[0].grado}° ${materias[0].seccion || ""}°`.trim()
                     : "Sin grado asignado"
                   : null}
               </span>
