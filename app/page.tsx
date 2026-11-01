@@ -161,7 +161,7 @@ export default function Login() {
                 href="/registro"
                 className="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
               >
-                ¿No tienes una cuenta? <span className="underline decoration-indigo-300 underline-offset-4">Regístrate ahora</span>
+                ¿No tenés una cuenta? <span className="underline decoration-indigo-300 underline-offset-4">Registrate ahora</span>
               </Link>
             </div>
           </form>
@@ -169,7 +169,7 @@ export default function Login() {
           <footer className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800/80 text-center">
             <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              Conexión cifrada de alta eficiencia
+              Aula Virtual EduCor - Todos los derechos reservados © 2026
             </span>
           </footer>
         </div>

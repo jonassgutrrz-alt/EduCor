@@ -130,16 +130,16 @@ export default function Registro() {
               Registro <span className="text-indigo-600 dark:text-indigo-400">EduCor</span>
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
-              {paso === 1 && "Verifica tu identidad con tu DNI"}
-              {paso === 2 && "Crea tus credenciales de acceso"}
-              {paso === 3 && "Confirmación requerida"}
+              {paso === 1 && "Paso 1 de 3: Verificá tu identidad con tu DNI"}
+              {paso === 2 && "Paso 2 de 3: Creá tus credenciales de acceso"}
+              {paso === 3 && "Paso 3 de 3: Confirmación requerida"}
             </p>
           </header>
 
           {paso === 1 && (
             <form onSubmit={handleVerificarDNI} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Número de DNI</label>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Número de DNI (sin puntos)</label>
                 <input type="text" required value={dni} onChange={(e) => setDni(e.target.value)} placeholder="Ej. 12345678" className="w-full min-h-12 px-4 py-2.5 text-slate-900 bg-white dark:bg-slate-800 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
               </div>
               <button type="submit" disabled={cargando} className="w-full min-h-12 px-4 py-3 text-white font-bold rounded-full bg-linear-to-r from-indigo-500 via-indigo-600 to-indigo-700 shadow-md hover:shadow-lg active:scale-95 disabled:opacity-50 transition-all cursor-pointer">
@@ -147,7 +147,7 @@ export default function Registro() {
               </button>
               <div className="text-center pt-2">
                 <Link href="/" className="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors">
-                  ¿Ya tienes una cuenta? <span className="underline decoration-indigo-300 underline-offset-4">Inicia sesión</span>
+                  ¿Ya tenés una cuenta? <span className="underline decoration-indigo-300 underline-offset-4">Iniciá sesión</span>
                 </Link>
               </div>
             </form>
@@ -184,7 +184,7 @@ export default function Registro() {
               </div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">¡Revisa tu bandeja de entrada!</h3>
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Hemos enviado un enlace de confirmación a <strong>{email}</strong>. Debes verificar tu correo antes de poder ingresar al aula.
+                Te hemos enviado un enlace de confirmación a <strong>{email}</strong>. Tenés que verificar tu correo antes de poder ingresar al aula.
               </p>
               <button onClick={() => router.push("/")} className="mt-6 w-full min-h-12 px-4 py-3 text-indigo-700 font-bold bg-indigo-50 rounded-full hover:bg-indigo-100 transition-all cursor-pointer">
                 Volver al Inicio de Sesión

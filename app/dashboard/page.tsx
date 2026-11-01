@@ -199,7 +199,7 @@ export default function Dashboard() {
                 {rol === "alumno"
                   ? materias[0]?.grado
                     ? `${materias[0].grado}° ${materias[0].seccion || ""}°`.trim()
-                    : "Sin grado asignado"
+                    : "Sin curso asignado"
                   : null}
               </span>
             </div>
