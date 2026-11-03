@@ -10,10 +10,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "EduCor - Plataforma Educativa",
+  title: "AulaLink - Plataforma Educativa",
   description: "Plataforma educativa interactiva, accesible y optimizada para bajo consumo de datos.",
   icons: {
-    icon: { url: "/EduCor.png", type: "image/png" },
+    icon: { url: "/AulaLink.png", type: "image/png" },
   },
 };
 

@@ -74,12 +74,12 @@ export default function Login() {
       <main className="relative w-full max-w-md sm:max-w-lg lg:max-w-xl transition-all duration-300">
         <div className="w-full bg-white/95 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-900/5 p-5 sm:p-8 md:p-10">
           
-          {/* Header Section: Replaced SVG with official EduCor.png Logo */}
+          {/* Header Section: Replaced SVG with official AulaLink.png Logo */}
           <header className="text-center mb-6 sm:mb-8">
             <div className="flex justify-center mb-3 sm:mb-4">
               <Image
-                src="/EduCor.png"
-                alt="Logo EduCor"
+                src="/AulaLink.png"
+                alt="Logo AulaLink"
                 width={80}
                 height={80}
                 priority
@@ -88,7 +88,7 @@ export default function Login() {
             </div>
             
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-              Edu<span className="text-indigo-600 dark:text-indigo-400">Cor</span>
+              Aula<span className="text-indigo-600 dark:text-indigo-400">Link</span>
             </h1>
             <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed max-w-sm mx-auto">
               Plataforma educativa interactiva optimizada para bajo consumo de datos
@@ -110,7 +110,7 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu.nombre@educor.com"
+                placeholder="tu.nombre@aulalink.com"
                 className="w-full min-h-12 px-3.5 sm:px-4 py-2.5 text-base sm:text-sm text-slate-900 bg-white dark:bg-slate-800 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all placeholder:text-slate-400 shadow-sm"
               />
             </div>
@@ -169,7 +169,7 @@ export default function Login() {
           <footer className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800/80 text-center">
             <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              Aula Virtual EduCor - Todos los derechos reservados © 2026
+              Aula Virtual AulaLink - Todos los derechos reservados © 2026
             </span>
           </footer>
         </div>

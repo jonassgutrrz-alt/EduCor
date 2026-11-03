@@ -146,8 +146,8 @@ function ContenidoMateria() {
   const clavesNotificaciones = (idUsuario: string) => {
     const alcance = `${idUsuario}:${id}`;
     return {
-      leidas: `educor:notificaciones:leidas:${alcance}`,
-      eliminadas: `educor:notificaciones:eliminadas:${alcance}`,
+      leidas: `AulaLink:notificaciones:leidas:${alcance}`,
+      eliminadas: `AulaLink:notificaciones:eliminadas:${alcance}`,
     };
   };
 
@@ -373,14 +373,14 @@ function ContenidoMateria() {
     if (archivoNuevaTarea) {
       const fileName = generarRutaArchivo("tareas", archivoNuevaTarea.name);
       const { error: uploadError } = await supabase.storage
-        .from("archivos-educor")
+        .from("archivos-AulaLink")
         .upload(fileName, archivoNuevaTarea);
       if (uploadError) {
         showToast("Error al subir el archivo adjunto.", "error");
         return;
       }
       const { data: urlData } = supabase.storage
-        .from("archivos-educor")
+        .from("archivos-AulaLink")
         .getPublicUrl(fileName);
       urlArchivo = urlData.publicUrl;
     }
@@ -436,14 +436,14 @@ function ContenidoMateria() {
     if (editTareaArchivo) {
       const fileName = generarRutaArchivo("tareas", editTareaArchivo.name);
       const { error: uploadError } = await supabase.storage
-        .from("archivos-educor")
+        .from("archivos-AulaLink")
         .upload(fileName, editTareaArchivo);
       if (uploadError) {
         showToast("Error al subir el nuevo archivo adjunto.", "error");
         return;
       }
       const { data: urlData } = supabase.storage
-        .from("archivos-educor")
+        .from("archivos-AulaLink")
         .getPublicUrl(fileName);
       urlArchivo = urlData.publicUrl;
     }
@@ -536,7 +536,7 @@ function ContenidoMateria() {
       }
       const fileName = generarRutaArchivo("entregas", archivo.name);
       const { error: uploadError } = await supabase.storage
-        .from("archivos-educor")
+        .from("archivos-AulaLink")
         .upload(fileName, archivo);
 
       if (uploadError) {
@@ -544,7 +544,7 @@ function ContenidoMateria() {
         return;
       }
       const { data: urlData } = supabase.storage
-        .from("archivos-educor")
+        .from("archivos-AulaLink")
         .getPublicUrl(fileName);
       contenidoFinal = urlData.publicUrl;
       pesoFinal = (archivo.size / (1024 * 1024)).toFixed(1) + " MB";
@@ -663,13 +663,13 @@ function ContenidoMateria() {
     const fileExt = nuevoMaterial.name.split(".").pop();
     const filePath = generarRutaArchivo("materiales", nuevoMaterial.name);
     const { error: uploadError } = await supabase.storage
-      .from("archivos-educor")
+      .from("archivos-AulaLink")
       .upload(filePath, nuevoMaterial);
 
     if (uploadError) return showToast("Error subiendo el archivo.", "error");
 
     const { data: urlData } = supabase.storage
-      .from("archivos-educor")
+      .from("archivos-AulaLink")
       .getPublicUrl(filePath);
     const pesoMB = (nuevoMaterial.size / (1024 * 1024)).toFixed(1) + " MB";
 
@@ -775,8 +775,8 @@ function ContenidoMateria() {
     return (
       <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center bg-slate-50 text-slate-600 px-4">
         <Image
-          src="/EduCor.png"
-          alt="EduCor Logo"
+          src="/AulaLink.png"
+          alt="AulaLink Logo"
           width={64}
           height={64}
           priority
@@ -800,20 +800,21 @@ function ContenidoMateria() {
           aria-label="Volver al dashboard"
           className="flex items-center gap-2 cursor-pointer text-left"
         >
-          <span className="min-h-[44px] text-xs sm:text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-semibold flex items-center gap-1.5 transition-colors">
-            ←
+
+          <span className="relative flex min-h-[44px] text-xs sm:text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-semibold flex items-center gap-2 transition-colors h-6 w-6 fill-current">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 288 544 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-434.7 0 73.4-73.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-128 128z"/></svg>
           </span>
           <Image
-            src="/EduCor.png"
-            alt="EduCor Logo"
-            width={38}
-            height={38}
+            src="/AulaLink.png"
+            alt="AulaLink Logo"
+            width={50}
+            height={50}
             priority
-            className="h-9 w-9 object-contain transition-transform"
+            className="h-12 w-12 object-contain transition-transform"
           />
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+          {/* <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
             Edu<span className="text-indigo-600 dark:text-indigo-400">Cor</span>
-          </h1>
+          </h1> */}
         </button>
 
         <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end sm:gap-4 border-t-2 sm:border-t-0 border-slate-100 dark:border-slate-800 pt-2 sm:pt-0">
@@ -1569,8 +1570,8 @@ export default function MateriaPage() {
       fallback={
         <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center bg-slate-50 text-slate-600 font-medium">
           <Image
-            src="/EduCor.png"
-            alt="EduCor Logo"
+            src="/AulaLink.png"
+            alt="AulaLink Logo"
             width={56}
             height={56}
             priority

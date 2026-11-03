@@ -131,8 +131,8 @@ export default function Dashboard() {
     return (
       <div className="min-h-dvh w-full flex flex-col items-center justify-center bg-slate-50 text-slate-600 px-4">
         <Image
-          src="/EduCor.png"
-          alt="EduCor Logo"
+          src="/AulaLink.png"
+          alt="AulaLink Logo"
           width={64}
           height={64}
           priority
@@ -148,22 +148,22 @@ export default function Dashboard() {
   return (
     <div className="min-h-dvh w-full bg-slate-50 py-4 px-3 sm:px-6 lg:px-8 overflow-x-hidden text-slate-800 dark:bg-slate-950 dark:text-slate-100">
       <div className="mx-auto w-full max-w-5xl space-y-4 sm:space-y-6">
-        {/* RESPONSIVE HEADER with official EduCor.png Logo */}
+        {/* RESPONSIVE HEADER with official AulaLink.png Logo */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-all">
           <div className="flex items-center justify-between sm:justify-start gap-3">
             <div className="flex items-center gap-3">
               <Image
-                src="/EduCor.png"
-                alt="EduCor Logo"
+                src="/AulaLink.png"
+                alt="AulaLink Logo"
                 width={44}
                 height={44}
                 priority
               />
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                  Edu
+                  Aula
                   <span className="text-indigo-600 dark:text-indigo-400">
-                    Cor
+                    Link
                   </span>
                 </h1>
               </div>

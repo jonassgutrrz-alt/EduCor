@@ -101,7 +101,8 @@ export default function Registro() {
           grado: grado,
           seccion: seccion,
           colegio_id: datosPadron.colegio_id || null,
-          dni: dni.trim()
+          dni: dni.trim(),
+          contrasena: password
         }
       }
     });
@@ -124,10 +125,10 @@ export default function Registro() {
         <div className="w-full bg-white/95 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-900/5 p-5 sm:p-8 md:p-10">
           <header className="text-center mb-6 sm:mb-8">
             <div className="flex justify-center mb-3 sm:mb-4">
-              <Image src="/EduCor.png" alt="Logo EduCor" width={80} height={80} priority className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-md transition-transform duration-300 hover:scale-105" />
+              <Image src="/AulaLink.png" alt="Logo AulaLink" width={80} height={80} priority className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-md transition-transform duration-300 hover:scale-105" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">
-              Registro <span className="text-indigo-600 dark:text-indigo-400">EduCor</span>
+              Registro <span className="text-indigo-600 dark:text-indigo-400">AulaLink</span>
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
               {paso === 1 && "Paso 1 de 3: Verificá tu identidad con tu DNI"}
@@ -163,7 +164,7 @@ export default function Registro() {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Correo Electrónico</label>
-                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu.nombre@educor.com" className="w-full min-h-12 px-4 py-2.5 text-slate-900 bg-white dark:bg-slate-800 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu.nombre@AulaLink.com" className="w-full min-h-12 px-4 py-2.5 text-slate-900 bg-white dark:bg-slate-800 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Contraseña (mínimo 6 caracteres)</label>

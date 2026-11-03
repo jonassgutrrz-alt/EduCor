@@ -43,10 +43,10 @@ function ContenidoSala() {
         const seccion = matData.seccion || "Unica";
         const nomLimpio = matData.nombre.replace(/[^a-zA-Z0-9]/g, "");
 
-        setRoomHash(`EduCor_Col${colId}_Grado${grado}_Sec${seccion}_Mat${id}_${nomLimpio}`);
+        setRoomHash(`AulaLink_Col${colId}_Grado${grado}_Sec${seccion}_Mat${id}_${nomLimpio}`);
       } else {
         setMateriaNombre(`Materia ${id}`);
-        setRoomHash(`EduCorAulaContingenciaMateria${id.replace(/[^a-zA-Z0-9]/g, "")}`);
+        setRoomHash(`AulaLinkAulaContingenciaMateria${id.replace(/[^a-zA-Z0-9]/g, "")}`);
       }
 
       setCargando(false);
@@ -74,7 +74,7 @@ function ContenidoSala() {
 
   const jitsiUser = useMemo(() => ({
     displayName: usuario,
-    email: `${usuario.replace(/\s+/g, '').toLowerCase()}@educor.local`
+    email: `${usuario.replace(/\s+/g, '').toLowerCase()}@AulaLink.local`
   }), [usuario]);
 
   // Memorizamos las funciones callback pasadas a Jitsi
@@ -110,7 +110,7 @@ function ContenidoSala() {
           aria-hidden="true"
         />
         <div className="relative flex flex-col items-center">
-          <Image src="/EduCor.png" alt="EduCor Logo" width={64} height={64} priority className="mb-4 h-16 w-16 animate-pulse object-contain" />
+          <Image src="/AulaLink.png" alt="AulaLink Logo" width={64} height={64} priority className="mb-4 h-16 w-16 animate-pulse object-contain" />
           <div className="mb-3 h-7 w-7 animate-spin rounded-full border-3 border-indigo-600 border-t-transparent" />
           <p className="text-sm font-medium sm:text-base">Generando túnel seguro...</p>
         </div>
@@ -136,8 +136,8 @@ function ContenidoSala() {
           </button>
           <div className="hidden h-8 w-px bg-slate-200 sm:block dark:bg-slate-700" />
           <Image
-            src="/EduCor.png"
-            alt="EduCor Logo"
+            src="/AulaLink.png"
+            alt="AulaLink Logo"
             width={40}
             height={40}
             priority
@@ -211,7 +211,7 @@ export default function SalaVirtual() {
             aria-hidden="true"
           />
           <div className="relative flex flex-col items-center">
-            <Image src="/EduCor.png" alt="EduCor Logo" width={56} height={56} priority className="mb-3 h-14 w-14 animate-pulse object-contain" />
+            <Image src="/AulaLink.png" alt="AulaLink Logo" width={56} height={56} priority className="mb-3 h-14 w-14 animate-pulse object-contain" />
             <p className="text-sm font-medium">Preparando entorno virtual...</p>
           </div>
         </div>
