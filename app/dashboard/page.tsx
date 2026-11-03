@@ -14,14 +14,35 @@ interface Materia {
   tareasPendientes: number;
 }
 
+const parseCSV = (text: string) => {
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(",").map((h) => h.trim());
+  const data = [];
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(",").map((v) => v.trim());
+    const row: Record<string, string> = {};
+    headers.forEach((h, index) => {
+      row[h] = values[index] || "";
+    });
+    data.push(row);
+  }
+  return data;
+};
+
 export default function Dashboard() {
   const [usuario, setUsuario] = useState("");
   const [rol, setRol] = useState("");
+  const [colegioIdAdmin, setColegioIdAdmin] = useState<string | null>(null);
   const [materias, setMaterias] = useState<Materia[]>([]);
   const [cargando, setCargando] = useState(true);
   const router = useRouter();
 
-  const fileCsvRef = useRef<HTMLInputElement>(null);
+  const filePadronRef = useRef<HTMLInputElement>(null);
+  const fileMateriasRef = useRef<HTMLInputElement>(null);
   const [mensajeAdmin, setMensajeAdmin] = useState("");
 
   useEffect(() => {
@@ -97,6 +118,16 @@ export default function Dashboard() {
           });
           setMaterias(materiasFormateadas);
         }
+      } else if (roleStored === "admin") {
+        const { data } = await supabase
+          .from("usuarios")
+          .select("colegio_id")
+          .eq("id", userId)
+          .single();
+
+        if (data) {
+          setColegioIdAdmin(data.colegio_id);
+        }
       }
 
       setCargando(false);
@@ -110,19 +141,95 @@ export default function Dashboard() {
     router.push("/");
   };
 
-  const handleCargarCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCargarPadronCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (!colegioIdAdmin) {
+      setMensajeAdmin("❌ Error: No se pudo identificar tu colegio.");
+      return;
+    }
+
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       const text = event.target?.result as string;
-      const lineas = text.split("\n").filter((line) => line.trim() !== "");
-      const cantidadUsuarios = lineas.length > 1 ? lineas.length - 1 : 0;
-      setMensajeAdmin(
-        `✅ ¡Éxito! Procesados ${cantidadUsuarios} usuarios del archivo CSV.`,
-      );
-      if (fileCsvRef.current) fileCsvRef.current.value = "";
+      const rows = parseCSV(text);
+
+      if (!rows.length) {
+        setMensajeAdmin(
+          "⚠️ El archivo está vacío o tiene un formato inválido.",
+        );
+        return;
+      }
+
+      const payload = rows.map((row) => ({
+        dni: row.dni,
+        nombre_completo: row.nombre_completo,
+        rol: row.rol,
+        grado: row.grado || null,
+        seccion: row.seccion || null,
+        colegio_id: colegioIdAdmin,
+        registrado: false,
+      }));
+
+      const { error } = await supabase
+        .from("padron_autorizado")
+        .insert(payload);
+
+      if (error) {
+        setMensajeAdmin(`❌ Error al subir padrón: ${error.message}`);
+      } else {
+        setMensajeAdmin(
+          `✅ ¡Éxito! Agregados ${payload.length} usuarios al padrón.`,
+        );
+      }
+
+      if (filePadronRef.current) filePadronRef.current.value = "";
+    };
+    reader.readAsText(file);
+  };
+
+  const handleCargarMateriasCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!colegioIdAdmin) {
+      setMensajeAdmin("❌ Error: No se pudo identificar tu colegio.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const text = event.target?.result as string;
+      const rows = parseCSV(text);
+
+      if (!rows.length) {
+        setMensajeAdmin(
+          "⚠️ El archivo está vacío o tiene un formato inválido.",
+        );
+        return;
+      }
+
+      const payload = rows.map((row) => ({
+        nombre: row.nombre,
+        descripcion: row.descripcion || null,
+        grado: row.grado,
+        seccion: row.seccion,
+        docente_dni: row.docente_dni || null,
+        colegio_id: colegioIdAdmin,
+      }));
+
+      const { error } = await supabase.from("materias").insert(payload);
+
+      if (error) {
+        setMensajeAdmin(`❌ Error al subir materias: ${error.message}`);
+      } else {
+        setMensajeAdmin(
+          `✅ ¡Éxito! Agregadas ${payload.length} materias nuevas.`,
+        );
+      }
+
+      if (fileMateriasRef.current) fileMateriasRef.current.value = "";
     };
     reader.readAsText(file);
   };
@@ -148,7 +255,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-dvh w-full bg-slate-50 py-4 px-3 sm:px-6 lg:px-8 overflow-x-hidden text-slate-800 dark:bg-slate-950 dark:text-slate-100">
       <div className="mx-auto w-full max-w-5xl space-y-4 sm:space-y-6">
-        {/* RESPONSIVE HEADER with official AulaLink.png Logo */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-all">
           <div className="flex items-center justify-between sm:justify-start gap-3">
             <div className="flex items-center gap-3">
@@ -169,13 +275,12 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Quick-tap 44px logout button for mobile */}
             <button
               onClick={handleCerrarSesion}
               className="sm:hidden min-h-[44px] min-w-[44px] px-3 py-2 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors cursor-pointer dark:bg-rose-950/40 dark:text-rose-400"
               aria-label="Cerrar sesión"
             >
-                            <svg
+              <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 640 640"
                 className="w-5 h-5 shrink-0 fill-current"
@@ -186,7 +291,6 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* User metadata & full desktop logout button */}
           <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <span className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium">
@@ -198,7 +302,7 @@ export default function Dashboard() {
               <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
                 {rol === "alumno"
                   ? materias[0]?.grado
-                    ? `${materias[0].grado}° ${materias[0].seccion || ""}°`.trim()
+                    ? `${materias[0].grado}° ${materias[0].seccion || ""}`.trim()
                     : "Sin curso asignado"
                   : null}
               </span>
@@ -219,7 +323,6 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* Dynamic Card Grids */}
         <main className="space-y-4 sm:space-y-6">
           <section className="bg-white dark:bg-slate-900 p-4 sm:p-6 md:p-8 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
@@ -236,7 +339,6 @@ export default function Dashboard() {
               </span>
             </div>
 
-            {/* FLUID CSS GRID */}
             {rol === "alumno" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 lg:gap-6">
                 {materias.map((materia) => (
@@ -302,7 +404,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Docente View */}
             {rol === "docente" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 lg:gap-6">
                 {materias.map((materia) => (
@@ -315,7 +416,10 @@ export default function Dashboard() {
                         {materia.nombre}
                       </h3>
                       <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                        Curso: {materia.grado ? `${materia.grado}° ${materia.seccion || ""}`.trim() : "Sin curso asignado"}
+                        Curso:{" "}
+                        {materia.grado
+                          ? `${materia.grado}° ${materia.seccion || ""}`.trim()
+                          : "Sin curso asignado"}
                       </p>
                     </div>
 
@@ -337,27 +441,47 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Admin CSV View */}
             {rol === "admin" && (
-              <div className="p-4 sm:p-6 bg-purple-50/60 dark:bg-purple-950/20 border border-purple-200/80 dark:border-purple-900 rounded-2xl space-y-4">
+              <div className="p-4 sm:p-6 bg-purple-50/60 dark:bg-purple-950/20 border border-purple-200/80 dark:border-purple-900 rounded-2xl space-y-6">
                 <div>
                   <h3 className="font-bold text-purple-950 dark:text-purple-200 text-base sm:text-lg">
-                    Carga Masiva de Usuarios (CSV)
+                    Carga Masiva de Datos (CSV)
                   </h3>
                   <p className="text-xs sm:text-sm text-purple-800 dark:text-purple-300 mt-1">
-                    Sube el padrón oficial de alumnos y docentes para
-                    sincronizar el sistema.
+                    Cargá los archivos del sistema. Se vincularán de forma
+                    segura al colegio asociado a tu cuenta. Los datos previos no
+                    serán eliminados.
                   </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white dark:bg-slate-900 p-3 sm:p-4 border border-purple-100 dark:border-purple-900/50 rounded-xl shadow-sm">
-                  <input
-                    type="file"
-                    accept=".csv"
-                    ref={fileCsvRef}
-                    onChange={handleCargarCSV}
-                    className="min-h-[44px] text-xs sm:text-sm text-slate-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200 cursor-pointer flex-1"
-                  />
+                <div className="space-y-4">
+                  <div className="flex flex-col gap-2 bg-white dark:bg-slate-900 p-3 sm:p-4 border border-purple-100 dark:border-purple-900/50 rounded-xl shadow-sm">
+                    <label className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300">
+                      1. Subir Padrón Autorizado (Alumnos y Docentes)
+                    </label>
+                    <input
+                      type="file"
+                      accept=".csv"
+                      ref={filePadronRef}
+                      onChange={handleCargarPadronCSV}
+                      disabled={!colegioIdAdmin}
+                      className="min-h-[44px] text-xs sm:text-sm text-slate-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200 cursor-pointer disabled:opacity-50"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2 bg-white dark:bg-slate-900 p-3 sm:p-4 border border-purple-100 dark:border-purple-900/50 rounded-xl shadow-sm">
+                    <label className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300">
+                      2. Subir Materias y Aulas
+                    </label>
+                    <input
+                      type="file"
+                      accept=".csv"
+                      ref={fileMateriasRef}
+                      onChange={handleCargarMateriasCSV}
+                      disabled={!colegioIdAdmin}
+                      className="min-h-[44px] text-xs sm:text-sm text-slate-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200 cursor-pointer disabled:opacity-50"
+                    />
+                  </div>
                 </div>
 
                 {mensajeAdmin && (
@@ -365,6 +489,110 @@ export default function Dashboard() {
                     {mensajeAdmin}
                   </div>
                 )}
+
+                {/* Guías de formato CSV */}
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white dark:bg-slate-900 p-4 border border-purple-100 dark:border-purple-900/50 rounded-xl shadow-sm">
+                    <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm mb-2 flex items-center gap-2">
+                      <svg
+                        className="w-4 h-4 text-purple-600 dark:text-purple-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      Guía: Padrón Autorizado
+                    </h4>
+                    <div className="text-xs text-slate-600 dark:text-slate-400 space-y-2">
+                      <p>
+                        El archivo debe contener la primera fila con los
+                        encabezados exactos. No incluyas la columna{" "}
+                        <code>colegio_id</code> ni <code>registrado</code>, el
+                        sistema las asigna automáticamente.
+                      </p>
+                      <ul className="list-disc pl-4 space-y-1">
+                        <li>
+                          <strong>Encabezados obligatorios:</strong>{" "}
+                          <code>dni, nombre_completo, rol, grado, seccion</code>
+                        </li>
+                        <li>
+                          <strong>rol:</strong> Escribir estrictamente{" "}
+                          <code>alumno</code>, <code>docente</code> o{" "}
+                          <code>admin</code> (en minúsculas).
+                        </li>
+                        <li>
+                          <strong>grado y seccion:</strong> Obligatorios para
+                          alumnos (ej: grado 4, seccion A). Para docentes o
+                          directivos, dejar estas celdas vacías.
+                        </li>
+                      </ul>
+                      <div className="mt-2 p-2 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 font-mono text-[10px] sm:text-xs overflow-x-auto">
+                        dni,nombre_completo,rol,grado,seccion
+                        <br />
+                        40111222,Rosa Gonzalez,alumno,4,A
+                        <br />
+                        28333444,Carlos Bianchi,docente,,
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white dark:bg-slate-900 p-4 border border-purple-100 dark:border-purple-900/50 rounded-xl shadow-sm">
+                    <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm mb-2 flex items-center gap-2">
+                      <svg
+                        className="w-4 h-4 text-purple-600 dark:text-purple-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      Guía: Materias y Aulas
+                    </h4>
+                    <div className="text-xs text-slate-600 dark:text-slate-400 space-y-2">
+                      <p>
+                        El archivo asigna las clases a los cursos y las vincula
+                        con el profesor responsable a través de su DNI. No
+                        incluyas <code>colegio_id</code>.
+                      </p>
+                      <ul className="list-disc pl-4 space-y-1">
+                        <li>
+                          <strong>Encabezados obligatorios:</strong>{" "}
+                          <code>
+                            nombre, descripcion, grado, seccion, docente_dni
+                          </code>
+                        </li>
+                        <li>
+                          <strong>docente_dni:</strong> Debe coincidir
+                          exactamente con el DNI de un docente previamente
+                          cargado en el padrón. Puede quedar vacío si aún no hay
+                          profesor asignado.
+                        </li>
+                        <li>
+                          <strong>grado y seccion:</strong> Indican a qué aula
+                          pertenece la materia.
+                        </li>
+                      </ul>
+                      <div className="mt-2 p-2 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 font-mono text-[10px] sm:text-xs overflow-x-auto">
+                        nombre,descripcion,grado,seccion,docente_dni
+                        <br />
+                        Historia,Historia Universal,4,A,28333444
+                        <br />
+                        Física,Física Dinámica,4,B,
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </section>
