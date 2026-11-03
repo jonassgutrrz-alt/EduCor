@@ -164,7 +164,7 @@ export default function Registro() {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Correo Electrónico</label>
-                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Ej: email@aulalink.com" className="w-full min-h-12 px-4 py-2.5 text-slate-900 bg-white dark:bg-slate-800 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Ej: nombre@email.com" className="w-full min-h-12 px-4 py-2.5 text-slate-900 bg-white dark:bg-slate-800 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Contraseña (mínimo 6 caracteres)</label>
