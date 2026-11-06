@@ -302,7 +302,7 @@ export default function Dashboard() {
               <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
                 {rol === "alumno"
                   ? materias[0]?.grado
-                    ? `${materias[0].grado}° ${materias[0].seccion || ""}`.trim()
+                    ? `${materias[0].grado}° ${materias[0].seccion || ""}°`.trim()
                     : "Sin curso asignado"
                   : null}
               </span>
@@ -418,7 +418,7 @@ export default function Dashboard() {
                       <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                         Curso:{" "}
                         {materia.grado
-                          ? `${materia.grado}° ${materia.seccion || ""}`.trim()
+                          ? `${materia.grado}° ${materia.seccion || ""}°`.trim()
                           : "Sin curso asignado"}
                       </p>
                     </div>

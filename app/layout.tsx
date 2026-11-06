@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     "Plataforma educativa interactiva, accesible y optimizada para bajo consumo de datos.",
   manifest: "/manifest.json",
   icons: {
-    icon: { url: "/AulaLink.png", type: "image/png" },
-    apple: { url: "/AulaLink.png", type: "image/png" },
+    icon: { url: "./public/AulaLink(1).png", type: "image/png" },
+    apple: { url: "./public/AulaLink(1).png", type: "image/png" },
   },
   alternates: {
     canonical: "https://www.aulalink.net",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     siteName: "AulaLink",
     images: [
       {
-        url: "/AulaLink.png",
+        url: "./public/AulaLink(1).png",
         width: 1200,
         height: 630,
         alt: "AulaLink Logo",
