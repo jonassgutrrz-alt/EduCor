@@ -1345,9 +1345,9 @@ function ContenidoMateria() {
                         if (fileMaterialRef.current)
                           fileMaterialRef.current.value = "";
                       }}
-                      className="text-rose-500 font-bold px-2 cursor-pointer"
+                      className="text-rose-500 font-bold px-2 cursor-pointer fill-current"
                     >
-                      Desadjuntar
+                      ✕
                     </button>
                   </div>
                 )}
@@ -1386,9 +1386,15 @@ function ContenidoMateria() {
                     {rol === "docente" && (
                       <button
                         onClick={() => handleBorrarMaterial(m.id)}
-                        className="min-h-9.5 text-rose-500 text-xs px-2.5 border border-rose-200 dark:border-rose-900 rounded-lg hover:bg-rose-50 cursor-pointer"
+                        className="min-h-9.5 text-rose-500 text-xs px-2.5 border border-rose-200 dark:border-rose-900 rounded-lg hover:bg-rose-50 cursor-pointer fill-current"
                       >
-                        Borrar
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 448 512"
+                          className="h-4 w-4 inline-block"
+                        >
+                          <path d="M166.2-16c-13.3 0-25.3 8.3-30 20.8L120 48 24 48C10.7 48 0 58.7 0 72S10.7 96 24 96l400 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-96 0-16.2-43.2C307.1-7.7 295.2-16 281.8-16L166.2-16zM32 144l0 304c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-304-48 0 0 304c0 8.8-7.2 16-16 16L96 464c-8.8 0-16-7.2-16-16l0-304-48 0zm160 72c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 176c0 13.3 10.7 24 24 24s24-10.7 24-24l0-176zm112 0c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 176c0 13.3 10.7 24 24 24s24-10.7 24-24l0-176z" />
+                        </svg>
                       </button>
                     )}
                   </div>
@@ -1436,9 +1442,15 @@ function ContenidoMateria() {
                       {puedeBorrar && (
                         <button
                           onClick={() => handleBorrarMensaje(m.id)}
-                          className="text-rose-500 hover:underline cursor-pointer"
+                          className="text-rose-500 hover:underline cursor-pointer fill-current"
                         >
-                          Borrar
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 448 512"
+                            className="h-4 w-4 inline-block"
+                          >
+                            <path d="M166.2-16c-13.3 0-25.3 8.3-30 20.8L120 48 24 48C10.7 48 0 58.7 0 72S10.7 96 24 96l400 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-96 0-16.2-43.2C307.1-7.7 295.2-16 281.8-16L166.2-16zM32 144l0 304c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-304-48 0 0 304c0 8.8-7.2 16-16 16L96 464c-8.8 0-16-7.2-16-16l0-304-48 0zm160 72c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 176c0 13.3 10.7 24 24 24s24-10.7 24-24l0-176zm112 0c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 176c0 13.3 10.7 24 24 24s24-10.7 24-24l0-176z" />
+                          </svg>
                         </button>
                       )}
                     </div>
@@ -1523,7 +1535,7 @@ function ContenidoMateria() {
           {rol === "docente" && (
             <form
               onSubmit={handleCrearTarea}
-              className="border-b border-slate-500 dark:border-slate-900 pb-5 mb-6 space-y-3"
+              className="border-b border-slate-300 dark:border-slate-900 pb-5 mb-6 space-y-3"
             >
               <h3 className="text-sm font-bold text-slate-900 dark:text-slate-200">
                 Publicar nueva tarea
@@ -1663,7 +1675,7 @@ function ContenidoMateria() {
                   >
                     {estaEditando ? (
                       /* Formulario de Edición de Tarea */
-                      <div className="space-y-3 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                      <div className="space-y-3">
                         <h4 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
                           Editar Tarea
                         </h4>
@@ -1851,7 +1863,7 @@ function ContenidoMateria() {
                                 <button
                                   type="button"
                                   onClick={() => handleBorrarTarea(t.id)}
-                                  className="text-xs bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 hover:bg-rose-100 px-2.5 py-1 rounded-lg font-semibold cursor-pointer transition-colors"
+                                  className="text-xs bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 fill-current hover:bg-rose-100 px-2.5 py-1 rounded-lg font-semibold cursor-pointer transition-colors"
                                 >
                                   Borrar
                                 </button>
@@ -1951,7 +1963,13 @@ function ContenidoMateria() {
                                     onClick={handleDesadjuntar}
                                     className="self-start text-xs text-rose-600 font-semibold cursor-pointer"
                                   >
-                                    Desadjuntar
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 448 512"
+                                      className="inline-block w-4 h-4"
+                                    >
+                                      <path d="M0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32z" />
+                                    </svg>
                                   </button>
                                 )}
                               </div>
@@ -2037,7 +2055,7 @@ function ContenidoMateria() {
                     </span>
                   </div>
 
-                  <div className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200/60 dark:border-slate-700 text-xs">
+                  <div className="border-t border-slate-300 dark:border-slate-700 pt-2 text-xs">
                     {e.tipo === "archivo" ? (
                       <a
                         href={e.contenido}

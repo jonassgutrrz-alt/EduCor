@@ -261,21 +261,21 @@ function ContenidoCalificaciones() {
       </div>
 
       {/* Contenedor responsivo con scroll horizontal limitado a la tabla */}
-      <div className="w-full overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900 shadow-sm scroll-smooth">
+      <div className="w-full overflow-x-auto border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm scroll-smooth">
         <table className="w-full min-w-max text-left text-xs border-collapse">
           <thead>
             <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-              <th className="p-3 font-bold bg-slate-100 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 min-w-[180px]">
+              <th className="p-3 font-bold bg-slate-100 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 min-w-45">
                 Alumno
               </th>
               {tareas.map((t) => (
-                <th key={t.id} className="p-3 font-semibold border-r border-slate-200 dark:border-slate-700 min-w-[130px] bg-indigo-50/50 dark:bg-indigo-950/30">
+                <th key={t.id} className="p-3 font-semibold border-r border-slate-200 dark:border-slate-700 min-w-32.5 bg-indigo-50/50 dark:bg-indigo-950/30">
                   <span className="block truncate">{t.titulo}</span>
                   <span className="text-[9px] text-indigo-500 font-normal">(Tarea)</span>
                 </th>
               ))}
               {columnasExtra.map((col) => (
-                <th key={col} className="p-3 font-semibold border-r border-slate-200 dark:border-slate-700 min-w-[140px]">
+                <th key={col} className="p-3 font-semibold border-r border-slate-200 dark:border-slate-700 min-w-35 bg-slate-50 dark:bg-slate-800/50">
                   <div className="flex items-center justify-between gap-2">
                     <span className="truncate">{col}</span>
                     <button
@@ -288,7 +288,7 @@ function ContenidoCalificaciones() {
                   </div>
                 </th>
               ))}
-              <th className="p-3 font-bold bg-slate-200 dark:bg-slate-700 border-l border-slate-300 dark:border-slate-600 min-w-[100px] text-center">
+              <th className="p-3 font-bold bg-slate-200 dark:bg-slate-700 border-l border-slate-300 dark:border-slate-600 min-w-25 text-center">
                 Nota Final
               </th>
             </tr>

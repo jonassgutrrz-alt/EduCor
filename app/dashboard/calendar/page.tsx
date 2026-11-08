@@ -148,6 +148,7 @@ export default function CalendarioConsolidado() {
                       title={`${t.materia_nombre}: ${t.titulo}`}
                     >
                       <span className="font-bold">{t.materia_nombre}:</span> {t.titulo}
+              
                     </div>
                   ))}
                 </div>

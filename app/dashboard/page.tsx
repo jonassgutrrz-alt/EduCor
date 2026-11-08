@@ -277,7 +277,7 @@ export default function Dashboard() {
 
             <button
               onClick={handleCerrarSesion}
-              className="sm:hidden min-h-[44px] min-w-[44px] px-3 py-2 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors cursor-pointer dark:bg-rose-950/40 dark:text-rose-400"
+              className="sm:hidden min-h-11 min-w-11 px-3 py-2 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors cursor-pointer dark:bg-rose-950/40 dark:text-rose-400"
               aria-label="Cerrar sesión"
             >
               <svg
@@ -309,7 +309,7 @@ export default function Dashboard() {
             </div>
             <button
               onClick={handleCerrarSesion}
-              className="hidden sm:inline-flex min-h-[44px] items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-400 dark:hover:bg-rose-950/70 rounded-xl transition-all cursor-pointer active:scale-95"
+              className="hidden sm:inline-flex min-h-11 items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-400 dark:hover:bg-rose-950/70 rounded-xl transition-all cursor-pointer active:scale-95"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -373,7 +373,7 @@ export default function Dashboard() {
                         onClick={() =>
                           router.push(`/dashboard/materia/${materia.id}`)
                         }
-                        className="w-full sm:w-auto min-h-[44px] px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white dark:bg-indigo-950/60 dark:text-indigo-300 dark:hover:bg-indigo-600 dark:hover:text-white transition-all duration-150 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                        className="w-full sm:w-auto min-h-11 px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white dark:bg-indigo-950/60 dark:text-indigo-300 dark:hover:bg-indigo-600 dark:hover:text-white transition-all duration-150 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         <span>Ingresar</span>
                         <svg
@@ -431,7 +431,7 @@ export default function Dashboard() {
                         onClick={() =>
                           router.push(`/dashboard/materia/${materia.id}`)
                         }
-                        className="min-h-[44px] px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-sm hover:shadow transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                        className="min-h-11 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-sm hover:shadow transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         Gestionar
                       </button>
@@ -465,7 +465,7 @@ export default function Dashboard() {
                       ref={filePadronRef}
                       onChange={handleCargarPadronCSV}
                       disabled={!colegioIdAdmin}
-                      className="min-h-[44px] text-xs sm:text-sm text-slate-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200 cursor-pointer disabled:opacity-50"
+                      className="min-h-11 text-xs sm:text-sm text-slate-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200 cursor-pointer disabled:opacity-50"
                     />
                   </div>
 
@@ -479,7 +479,7 @@ export default function Dashboard() {
                       ref={fileMateriasRef}
                       onChange={handleCargarMateriasCSV}
                       disabled={!colegioIdAdmin}
-                      className="min-h-[44px] text-xs sm:text-sm text-slate-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200 cursor-pointer disabled:opacity-50"
+                      className="min-h-11 text-xs sm:text-sm text-slate-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200 cursor-pointer disabled:opacity-50"
                     />
                   </div>
                 </div>
