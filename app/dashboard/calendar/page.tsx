@@ -11,6 +11,22 @@ interface EventoTarea {
   materia_nombre: string;
 }
 
+// Extraemos la lógica impura (fechas) fuera del componente para evitar que
+// Next.js detecte valores inestables durante el renderizado estático/SSR.
+const obtenerDatosCalendario = () => {
+  const hoy = new Date();
+  const anio = hoy.getFullYear();
+  const mes = hoy.getMonth();
+  
+  return {
+    anio,
+    mes,
+    diasEnMes: new Date(anio, mes + 1, 0).getDate(),
+    primerDiaSemana: new Date(anio, mes, 1).getDay(),
+    nombreMes: hoy.toLocaleString("es-AR", { month: "long", year: "numeric" }).toUpperCase()
+  };
+};
+
 export default function CalendarioConsolidado() {
   const router = useRouter();
   const [eventos, setEventos] = useState<EventoTarea[]>([]);
@@ -75,19 +91,18 @@ export default function CalendarioConsolidado() {
     cargarCalendario();
   }, [router]);
 
-  const hoy = new Date();
-  const anio = hoy.getFullYear();
-  const mes = hoy.getMonth();
-  const diasEnMes = new Date(anio, mes + 1, 0).getDate();
-  const primerDiaSemana = new Date(anio, mes, 1).getDay();
-
-  const diasArray = Array.from({ length: diasEnMes }, (_, i) => i + 1);
-  const offsetArray = Array.from({ length: primerDiaSemana }, (_, i) => i);
-  const diasSemana = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-
+  // Si está cargando, el componente se queda acá. Esto asegura que el servidor (SSR)
+  // solo renderice este estado, evitando cualquier discrepancia con las fechas.
   if (cargando) {
     return <div className="p-8 text-center text-slate-500 text-sm">Cargando calendario de entregas...</div>;
   }
+
+  // Se ejecuta solo en el cliente una vez que la carga finalizó
+  const { anio, mes, diasEnMes, primerDiaSemana, nombreMes } = obtenerDatosCalendario();
+  
+  const diasArray = Array.from({ length: diasEnMes }, (_, i) => i + 1);
+  const offsetArray = Array.from({ length: primerDiaSemana }, (_, i) => i);
+  const diasSemana = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
@@ -95,7 +110,7 @@ export default function CalendarioConsolidado() {
         <div>
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">Calendario Consolidado de Entregas</h1>
           <p className="text-xs text-slate-500">
-            {hoy.toLocaleString("es-AR", { month: "long", year: "numeric" }).toUpperCase()}
+            {nombreMes}
           </p>
         </div>
         <button
@@ -115,7 +130,7 @@ export default function CalendarioConsolidado() {
 
         <div className="grid grid-cols-7 auto-rows-fr gap-px bg-slate-200 dark:bg-slate-800">
           {offsetArray.map((i) => (
-            <div key={`offset-${i}`} className="bg-slate-50/50 dark:bg-slate-900/50 min-h-[90px]" />
+            <div key={`offset-${i}`} className="bg-slate-50/50 dark:bg-slate-900/50 min-h-22.5" />
           ))}
 
           {diasArray.map((dia) => {
@@ -123,9 +138,9 @@ export default function CalendarioConsolidado() {
             const tareasDelDia = eventos.filter((e) => e.fecha_limite.startsWith(fechaStr));
 
             return (
-              <div key={dia} className="bg-white dark:bg-slate-900 p-2 min-h-[90px] flex flex-col justify-start">
+              <div key={dia} className="bg-white dark:bg-slate-900 p-2 min-h-22.5 flex flex-col justify-start">
                 <span className="text-xs font-bold text-slate-500 mb-1">{dia}</span>
-                <div className="space-y-1 overflow-y-auto max-h-[70px]">
+                <div className="space-y-1 overflow-y-auto max-h-17.5">
                   {tareasDelDia.map((t) => (
                     <div
                       key={t.id}
