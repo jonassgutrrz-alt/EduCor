@@ -130,7 +130,7 @@ function ContenidoSala() {
           <div className="flex w-full items-center gap-3 sm:w-auto">
           <button
             onClick={() => router.push(`/dashboard/materia/${id}`)}
-            className="min-h-[44px] shrink-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-indigo-300 dark:hover:bg-slate-700"
+            className="min-h-11 shrink-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-indigo-300 dark:hover:bg-slate-700"
           >
             ← Volver
           </button>
@@ -182,8 +182,8 @@ function ContenidoSala() {
           </div>
         </div>
       ) : (
-        <div className="relative mx-auto flex min-h-[420px] w-full max-w-7xl flex-1 p-2 sm:p-4">
-          <div className="relative flex min-h-0 w-full flex-1 overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-xl shadow-slate-900/10 dark:border-slate-800">
+        <div className="relative mx-auto flex min-h-105 w-full flex-1">
+          <div className="relative flex min-h-0 w-full flex-1 overflow-hidden border border-slate-200 bg-slate-900 shadow-xl shadow-slate-900/10 dark:border-slate-800">
           <JitsiMeeting
             domain="meet.jit.si"
             roomName={roomHash}

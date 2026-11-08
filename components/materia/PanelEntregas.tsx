@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/components/Toast";
+import RubricaEvaluacion from "./RubricaEvaluacion";
 
 interface EntregaAlumno {
   id: number;
@@ -29,6 +30,7 @@ export default function PanelEntregas({ materiaId }: Props) {
   const [notasTemp, setNotasTemp] = useState<{ [key: number]: string }>({});
   const [devolucionesTemp, setDevolucionesTemp] = useState<{ [key: number]: string }>({});
   const [calificacionEditable, setCalificacionEditable] = useState<number | null>(null);
+  const [usarRubrica, setUsarRubrica] = useState<{ [key: number]: boolean }>({});
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
@@ -69,6 +71,11 @@ export default function PanelEntregas({ materiaId }: Props) {
     } else {
       showToast("Error al guardar la calificación.", "error");
     }
+  };
+
+  const recibirDatosRubrica = (idEntrega: number, notaRubrica: string, devolucionRubrica: string) => {
+    setNotasTemp((prev) => ({ ...prev, [idEntrega]: notaRubrica }));
+    setDevolucionesTemp((prev) => ({ ...prev, [idEntrega]: devolucionRubrica }));
   };
 
   if (cargando) {
@@ -112,7 +119,7 @@ export default function PanelEntregas({ materiaId }: Props) {
                   <span className="font-bold text-emerald-700 dark:text-emerald-400 mr-2 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded">
                     Nota: {e.nota}
                   </span>
-                  <span className="text-slate-600 dark:text-slate-400 italic">&quot;{e.devolucion}&quot;</span>
+                  <span className="text-slate-600 dark:text-slate-400 italic whitespace-pre-wrap">&quot;{e.devolucion}&quot;</span>
                 </div>
                 <button
                   onClick={() => {
@@ -126,33 +133,52 @@ export default function PanelEntregas({ materiaId }: Props) {
                 </button>
               </div>
             ) : (
-              <div className="flex flex-wrap gap-2 items-center pt-2">
-                <input
-                  type="text"
-                  placeholder="Nota"
-                  defaultValue={notasTemp[e.id] || ""}
-                  onChange={(ev) => setNotasTemp({ ...notasTemp, [e.id]: ev.target.value })}
-                  className="w-20 min-h-[40px] px-2.5 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Devolución al alumno"
-                  defaultValue={devolucionesTemp[e.id] || ""}
-                  onChange={(ev) => setDevolucionesTemp({ ...devolucionesTemp, [e.id]: ev.target.value })}
-                  className="min-w-0 w-full sm:flex-1 min-h-[40px] px-2.5 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleGuardarCalificacion(e.id)}
-                  className="min-h-[40px] px-4 py-1 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 cursor-pointer shadow-sm"
-                >
-                  Guardar
-                </button>
-                {e.nota && (
-                  <button type="button" onClick={() => setCalificacionEditable(null)} className="min-h-[40px] px-3 py-1 bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg hover:bg-slate-300 cursor-pointer">
-                    Cancelar
-                  </button>
+              <div className="pt-2">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Panel de Calificación</span>
+                  <label className="text-[10px] font-bold flex items-center gap-1.5 cursor-pointer text-indigo-600">
+                    <input
+                      type="checkbox"
+                      checked={usarRubrica[e.id] || false}
+                      onChange={(ev) => setUsarRubrica({ ...usarRubrica, [e.id]: ev.target.checked })}
+                      className="accent-indigo-600 cursor-pointer"
+                    />
+                    Usar Rúbrica Interactiva
+                  </label>
+                </div>
+
+                {usarRubrica[e.id] && (
+                  <RubricaEvaluacion onGenerarEvaluacion={(n, d) => recibirDatosRubrica(e.id, n, d)} />
                 )}
+
+                <div className="flex flex-wrap gap-2 items-center pt-2">
+                  <input
+                    type="text"
+                    placeholder="Nota"
+                    value={notasTemp[e.id] !== undefined ? notasTemp[e.id] : (e.nota || "")}
+                    onChange={(ev) => setNotasTemp({ ...notasTemp, [e.id]: ev.target.value })}
+                    className="w-20 min-h-[40px] px-2.5 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Devolución al alumno"
+                    value={devolucionesTemp[e.id] !== undefined ? devolucionesTemp[e.id] : (e.devolucion || "")}
+                    onChange={(ev) => setDevolucionesTemp({ ...devolucionesTemp, [e.id]: ev.target.value })}
+                    className="min-w-0 w-full sm:flex-1 min-h-[40px] px-2.5 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleGuardarCalificacion(e.id)}
+                    className="min-h-[40px] px-4 py-1 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 cursor-pointer shadow-sm"
+                  >
+                    Guardar
+                  </button>
+                  {e.nota && (
+                    <button type="button" onClick={() => setCalificacionEditable(null)} className="min-h-[40px] px-3 py-1 bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg hover:bg-slate-300 cursor-pointer">
+                      Cancelar
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>

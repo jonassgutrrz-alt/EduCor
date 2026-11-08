@@ -26,6 +26,48 @@
   }
 }
 
+.assignment-rich-text {
+  font-size: 0.75rem;
+  line-height: 0.80rem;
+}
+
+.assignment-rich-text h1 {
+  margin: 0.25rem 0 0.25rem;
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+}
+
+.assignment-rich-text h2 {
+  margin: 0.25rem 0 0.25rem;
+  font-size: 1rem;
+  line-height: 1rem;
+  font-weight: 700;
+}
+
+.assignment-rich-text ul,
+.assignment-rich-text ol {
+  margin: 0.2rem 0;
+  padding-left: 1.5rem;
+}
+
+.assignment-rich-text ul {
+  list-style: disc;
+}
+
+.assignment-rich-text ol {
+  list-style: decimal;
+}
+
+.assignment-rich-text li {
+  display: list-item;
+  margin-bottom: 0.25rem;
+}
+
+.assignment-rich-text p {
+  margin-top: 0.25rem;
+}
+
 /* ==========================================================================
    Motion Design: Global Page Transition (60fps GPU Composited)
    - Style: Smooth Fade-In + Elevation Glide
