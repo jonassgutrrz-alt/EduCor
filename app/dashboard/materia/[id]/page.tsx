@@ -99,7 +99,7 @@ const formatearFechaHora = (fechaStr?: string | null) => {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
-  })} a las ${d.toLocaleTimeString("es-AR", {
+  })} - ${d.toLocaleTimeString("es-AR", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -155,7 +155,7 @@ const EditorMenuBar = ({ editor }: { editor: Editor | null }) => {
         onClick={() => editor.chain().focus().toggleBold().run()}
         className={`px-2 py-1 text-xs rounded font-bold transition-colors ${active.bold ? "bg-indigo-200 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100" : "hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300"}`}
       >
-        B
+        N
       </button>
       <button
         type="button"
@@ -169,7 +169,7 @@ const EditorMenuBar = ({ editor }: { editor: Editor | null }) => {
         onClick={() => editor.chain().focus().toggleUnderline().run()}
         className={`px-2 py-1 text-xs rounded underline transition-colors ${active.underline ? "bg-indigo-200 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100" : "hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300"}`}
       >
-        U
+        S
       </button>
       <div className="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
       <button
@@ -191,7 +191,7 @@ const EditorMenuBar = ({ editor }: { editor: Editor | null }) => {
         onClick={() => editor.chain().focus().setParagraph().run()}
         className={`px-2 py-1 text-xs rounded transition-colors ${active.paragraph ? "bg-indigo-200 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100" : "hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300"}`}
       >
-        Texto normal
+        Normal
       </button>
       <div className="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
       <button
@@ -199,14 +199,14 @@ const EditorMenuBar = ({ editor }: { editor: Editor | null }) => {
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={`px-2 py-1 text-xs rounded transition-colors ${active.bulletList ? "bg-indigo-200 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100" : "hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300"}`}
       >
-        • Lista
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 fill-current"><path d="M48 144a48 48 0 1 0 0-96 48 48 0 1 0 0 96zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L192 64zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zM48 464a48 48 0 1 0 0-96 48 48 0 1 0 0 96zM96 256a48 48 0 1 0 -96 0 48 48 0 1 0 96 0z"/></svg>
       </button>
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         className={`px-2 py-1 text-xs rounded transition-colors ${active.orderedList ? "bg-indigo-200 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100" : "hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300"}`}
       >
-        1. Lista
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="w-3.5 h-3.5 fill-current"><path d="M0 72C0 58.8 10.7 48 24 48l48 0c13.3 0 24 10.7 24 24l0 104 24 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-96 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l24 0 0-80-24 0C10.7 96 0 85.3 0 72zM30.4 301.2C41.8 292.6 55.7 288 70 288l4.9 0c33.7 0 61.1 27.4 61.1 61.1 0 19.6-9.4 37.9-25.2 49.4l-24 17.5 33.2 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-90.7 0C13.1 464 0 450.9 0 434.7 0 425.3 4.5 416.5 12.1 411l70.5-51.3c3.4-2.5 5.4-6.4 5.4-10.6 0-7.2-5.9-13.1-13.1-13.1L70 336c-3.9 0-7.7 1.3-10.8 3.6L38.4 355.2c-10.6 8-25.6 5.8-33.6-4.8S-1 324.8 9.6 316.8l20.8-15.6zM224 64l256 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 160l256 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 160l256 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/></svg>
       </button>
     </div>
   );
@@ -1145,7 +1145,7 @@ function ContenidoMateria() {
           </h1>
         </button>
 
-        <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end sm:gap-4">
+        <div className="max-sm:border-t max-sm:border-slate-300 flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end sm:gap-4">
           <div className="flex items-center gap-2">
             <span className="max-w-[55vw] truncate text-xs sm:max-w-none sm:text-sm text-slate-600 dark:text-slate-300 font-medium">
               {usuario}
@@ -1829,15 +1829,15 @@ function ContenidoMateria() {
                             <h3 className="min-w-0 wrap-break-word font-bold text-slate-800 dark:text-slate-100 text-sm">
                               {t.titulo}
                             </h3>
-                            <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                              <span>
-                                Publicado: {formatearFechaHora(t.fecha)}
-                              </span>
-                              {t.editado_en && (
-                                <span className="italic text-indigo-600 dark:text-indigo-400 font-medium">
-                                  • Editado: {formatearFechaHora(t.editado_en)}
+                            <div className="flex flex-wrap items-center text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                              <span className="font-bold">
+                                Publicado: {formatearFechaHora(t.fecha)}. {t.editado_en && (
+                                <span className="italic font-normal">
+                                  Editado ({formatearFechaHora(t.editado_en)}.)
                                 </span>
                               )}
+                              </span>
+
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -1873,7 +1873,7 @@ function ContenidoMateria() {
                         </div>
 
                         <div
-                          className="assignment-rich-text text-slate-700 dark:text-slate-300"
+                          className="border-t border-slate-200 dark:border-slate-700 assignment-rich-text pt-2 text-sm text-slate-800 dark:text-slate-200"
                           dangerouslySetInnerHTML={{ __html: t.descripcion }}
                         />
 
@@ -2004,7 +2004,7 @@ function ContenidoMateria() {
                           <div className="mt-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg">
                             <div className="flex justify-between items-center mb-1">
                               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                Calificación del Docente
+                                Calificación
                               </span>
                               <span
                                 className={`text-xs font-bold px-2 py-0.5 rounded ${entregaRealizada.nota ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}
@@ -2051,6 +2051,9 @@ function ContenidoMateria() {
                       {e.usuarios?.nombre_completo || "Alumno"} -{" "}
                       <span className="text-indigo-600 dark:text-indigo-400">
                         {e.tareas?.titulo || "Tarea General"}
+                      </span>
+                      <span className="text-slate-500 dark:text-slate-400 ml-2 text-[11px] leading-none font-normal">
+                        Entregado: {formatearFechaHora(e.fecha)}
                       </span>
                     </span>
                   </div>
